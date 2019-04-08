@@ -2,6 +2,8 @@ package com.antoiovi.serialtalk;
 
 import jssc.SerialPort;
 
+import com.antoiovi.Serial;
+
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -11,28 +13,41 @@ import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
+import java.awt.FlowLayout;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+
+import com.antoiovi.SerialException;
+import com.antoiovi.SerialRead;
+
+import javax.swing.BoxLayout;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.awt.event.ActionEvent;
+import javax.swing.JTextArea;
 
 public class Talk extends JFrame {
 
-	static final String[] baud_rates ={
-		String.valueOf(SerialPort.BAUDRATE_110),
-		String.valueOf(SerialPort.BAUDRATE_300),
-		String.valueOf(SerialPort.BAUDRATE_600),
-		String.valueOf(SerialPort.BAUDRATE_1200),
-		String.valueOf(SerialPort.BAUDRATE_4800),
-		String.valueOf(SerialPort.BAUDRATE_9600),
-		String.valueOf(SerialPort.BAUDRATE_14400),
-		String.valueOf(SerialPort.BAUDRATE_19200),
-		String.valueOf(SerialPort.BAUDRATE_38400),
-
-		String.valueOf(SerialPort.BAUDRATE_115200),
-		String.valueOf(SerialPort.BAUDRATE_128000),
-		String.valueOf(SerialPort.BAUDRATE_256000),
+	    Pair[] baud_rates ={
+		new Pair(String.valueOf(SerialPort.BAUDRATE_110)    ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_300)    ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_600)    ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_1200)   ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_4800)   ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_9600)   ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_14400)  ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_19200)  ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_38400)  ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_115200) ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_128000) ,SerialPort.BAUDRATE_110),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_256000) ,SerialPort.BAUDRATE_110) 
 	};
 	
 	String[] port_names ={
 			"/dev/tty0","/dev/tty1","/dev/tty2",
-			"/dev/USB0","/dev/USB1","/dev/USB1"
+			"/dev/USB0","/dev/USB1","/dev/USB2"
 		};
 	
 	Integer[] data_bits ={
@@ -42,18 +57,24 @@ public class Talk extends JFrame {
 			SerialPort.DATABITS_8
 		};
 	
-	Integer[] stop_bits ={
- 			SerialPort.STOPBITS_1,
-			SerialPort.STOPBITS_2,
-			SerialPort.STOPBITS_1_5
+	Double[] stop_bits ={
+ 			(double)SerialPort.STOPBITS_1,
+ 			(double)SerialPort.STOPBITS_2,
+ 			(double)SerialPort.STOPBITS_1_5
 		};
 
     
-	String[] parity_options ={
+	String[] parity_opptions ={
 			"NONE","ODD","EVEN","MARK","SPACE"
 		};
     
-
+	Pair[] parity_options ={
+			new Pair("NONE",SerialPort.PARITY_NONE),
+			new Pair("EVEN",SerialPort.PARITY_EVEN),
+			new Pair("MARK",SerialPort.PARITY_MARK),
+			new Pair("SPACE",SerialPort.PARITY_SPACE)
+		};
+    
     public static final int PARITY_NONE = 0;
     public static final int PARITY_ODD = 1;
     public static final int PARITY_EVEN = 2;
@@ -69,7 +90,20 @@ public class Talk extends JFrame {
 	  double stopBits =1.0; //stop_bits
 	  boolean RTS=true;
 	  boolean DTR=true;
+	  private JComboBox comboBoxPortname;
+	  private JComboBox comboBoxBaudrate;
+	  private JComboBox comboBoxParityBits;
+	  private JComboBox comboBoxDataBits;
+	  private JComboBox comboBoxStopBits;
+	  private JCheckBox chckbxRTS;
+	  private JCheckBox chckbxDTR;
+	  private JPanel panel_1;
+	  private JButton btnTestConnection;
 	  
+	  static Talk app;
+	  private JTextArea textArea;
+	  private JButton btnClearOutput;
+	  private JScrollPane scrollPane;
 	  
 	/**
 	 * Launch the application.
@@ -79,6 +113,7 @@ public class Talk extends JFrame {
 			public void run() {
 				try {
 					Talk frame = new Talk();
+					app=frame;
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -93,44 +128,161 @@ public class Talk extends JFrame {
 	public Talk() {
 		setBounds(100, 100, 450, 300);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		
 		JPanel panel = new JPanel();
-		getContentPane().add(panel, BorderLayout.CENTER);
+		getContentPane().add(panel);
 		
 		
-		
- 		
-
- 		
  		JLabel lblPortName = new JLabel("Port Name");
- 		JComboBox comboBoxPortname = new JComboBox(new DefaultComboBoxModel(port_names));
+ 		comboBoxPortname = new JComboBox(new DefaultComboBoxModel(port_names));
  		panel.add(comboBoxPortname);
  		JLabel lblNewLabel = new JLabel("Baud Rate");
- 		JComboBox comboBoxBaudrate = new JComboBox(new DefaultComboBoxModel(baud_rates));
+ 		comboBoxBaudrate = new JComboBox(new DefaultComboBoxModel(baud_rates));
  		panel.add(comboBoxBaudrate);
  		
  		JLabel lblParity = new JLabel("Parity");
  		panel.add(lblParity);
  		
- 		JComboBox comboBoxParityBits = new JComboBox(new DefaultComboBoxModel(parity_options));
+ 		comboBoxParityBits = new JComboBox(new DefaultComboBoxModel(parity_options));
  		panel.add(comboBoxParityBits);
  		
  		JLabel lblDataBits = new JLabel("Data bits");
  		panel.add(lblDataBits);
-  		JComboBox comboBoxDataBits = new JComboBox(new DefaultComboBoxModel(data_bits));
+  		comboBoxDataBits = new JComboBox(new DefaultComboBoxModel(data_bits));
  		panel.add(comboBoxDataBits);
  		
  		JLabel lblStopBits = new JLabel("Stop bits");
  		panel.add(lblStopBits);
- 		JComboBox comboBoxStopBits = new JComboBox(new DefaultComboBoxModel(stop_bits));
+ 		comboBoxStopBits = new JComboBox(new DefaultComboBoxModel(stop_bits));
  		panel.add(comboBoxStopBits);
  		
- 		JCheckBox chckbxRTS = new JCheckBox("RTS");
+ 		chckbxRTS = new JCheckBox("RTS");
  		panel.add(chckbxRTS);
  		
- 		JCheckBox chckbxDTR = new JCheckBox("DTR");
+ 		chckbxDTR = new JCheckBox("DTR");
  		panel.add(chckbxDTR);
+ 		
+ 		panel_1 = new JPanel();
+ 		getContentPane().add(panel_1);
+ 		
+ 		btnTestConnection = new JButton("Test Connection");
+ 		btnTestConnection.addActionListener(new ActionListener() {
+ 			public void actionPerformed(ActionEvent e) {
+ 				app.testConnection();
+ 			}
+ 		});
+ 		panel_1.add(btnTestConnection);
+ 		
+ 		btnClearOutput = new JButton("Clear output");
+ 		btnClearOutput.addActionListener(new ActionListener() {
+ 			public void actionPerformed(ActionEvent e) {
+ 				app.clearOutput();
+ 			}
+ 		});
+ 		panel_1.add(btnClearOutput);
+ 		
+ 		textArea = new JTextArea();
+ 		textArea.setEditable(false);
+ 		//getContentPane().add(textArea);
+ 		
+ 		scrollPane = new JScrollPane(textArea);
+ 		getContentPane().add(scrollPane);
+ 		init();
  
 	}
 
+	
+	private void  init() {
+	comboBoxBaudrate.setSelectedItem(baud_rates[5]);
+	comboBoxPortname.setSelectedItem(port_names[3]);
+	comboBoxDataBits.setSelectedItem(SerialPort.DATABITS_8);
+	comboBoxParityBits.setSelectedItem(parity_options[PARITY_NONE]);
+	chckbxDTR.setSelected(true);
+	chckbxRTS.setSelected(true);
+	}
+	
+	private void testConnection() {
+		String name = "/dev/ttyUSB0";
+		Serial serial;
+		int baudrate;
+		int parity;
+		int databits;
+		double stopbit;
+		boolean setRTS;
+		boolean setDTR;
+		
+		try {
+			name=(String)comboBoxPortname.getSelectedItem();
+
+			Pair p=(Pair)comboBoxBaudrate.getSelectedItem();
+			baudrate=p.value.intValue();
+			p=(Pair)comboBoxParityBits.getSelectedItem();
+			parity=p.value.intValue();
+			
+			databits=(Integer)comboBoxDataBits.getSelectedItem();
+			stopbit=(Double)comboBoxStopBits.getSelectedItem();
+			
+			setRTS=	chckbxDTR.isSelected();
+			setDTR=chckbxRTS.isSelected();
+					
+			serial = new Serial( name, baudrate, parity, databits, stopbit,  setRTS,  setDTR); 
+			//throws SerialException {
+
+ 			if (serial.portIsOpened()) {
+ 				app.appendMessage("Porta aperta :");
+				TimeUnit.SECONDS.sleep(1);
+				app.appendMessage("Lettura dati ... :");
+
+				 
+				//readString();
+				app.appendMessage("Chiusyra porta seriale :");
+
+ 				serial.dispose();
+
+			} else
+				System.out.println("Porta NON e aperta !!!");
+		} catch (SerialException e) {
+			app.appendMessage("Serial Exception :");
+			app.appendMessage(e.getMessage());
+			//e.printStackTrace();
+		} catch (IOException e) {
+			app.appendMessage("IO Exception :");
+			app.appendMessage(e.getMessage());
+ 		//	e.printStackTrace();
+		} catch (InterruptedException e) {
+			// Timeunit.Seconds.sleep(..) exception
+			app.appendMessage("InterruptedException :");
+			app.appendMessage(e.getMessage());
+ 			//e.printStackTrace();
+		}
+	}
+	
+	void appendMessage(String str) {
+		textArea.append(str);
+		textArea.append("\n");
+
+	}
+	
+	void clearOutput() {
+		textArea.setText("");
+		
+	}
+	
+	private class Pair{
+		String name;
+		Integer value;
+		
+ 		public Pair(String name, Integer value) {
+			super();
+			this.name = name;
+			this.value = value;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
+		
+	}
 }
