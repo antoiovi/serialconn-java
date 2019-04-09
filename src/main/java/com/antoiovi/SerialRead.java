@@ -31,9 +31,9 @@ public class SerialRead extends Serial {
 		buffer = new ArrayList<String>();
 	}
 
-	public SerialRead(String iname, int irate, int parityNone, int idatabits, double d, boolean setRTS, boolean setDTR)
+	public SerialRead(String iname, int irate, int parityNone, int idatabits, double stopbit, boolean setRTS, boolean setDTR)
 			throws SerialException {
-		super(iname, irate, parityNone, idatabits, d, setRTS, setDTR);
+		super(iname, irate, parityNone, idatabits, stopbit, setRTS, setDTR);
 		buffer = new ArrayList<String>();
 	}
 

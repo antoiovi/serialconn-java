@@ -47,7 +47,7 @@ public class Serial implements SerialPortEventListener {
   int baudRate =9600;
   int parity=SerialPort.PARITY_NONE;
   int databits=8;
-  double d =1.0; 
+  double stopbit =1.0; 
   boolean RTS=true;
   boolean DTR=true;
   
@@ -59,7 +59,7 @@ public class Serial implements SerialPortEventListener {
  * @throws SerialException
  */
   public Serial() throws SerialException {
-	  init(name, baudRate, parity,  databits,  d,  RTS, DTR);
+	  init(name, baudRate, parity,  databits,  stopbit,  RTS, DTR);
   }
 /**
  *   Inizzializza con parametri di default tranne Nome Porta
@@ -67,7 +67,7 @@ public class Serial implements SerialPortEventListener {
  * @throws SerialException
  */
   public Serial(String iname) throws SerialException {
-	  init(iname, baudRate, parity,  databits,  d,  RTS, DTR);
+	  init(iname, baudRate, parity,  databits,  stopbit,  RTS, DTR);
   }
 
 /**
@@ -76,14 +76,14 @@ public class Serial implements SerialPortEventListener {
  * @param irate
  * @param parityNone
  * @param idatabits
- * @param d
+ * @param stopbit
  * @param setRTS
  * @param setDTR
  * @throws SerialException
  */
-public Serial(String iname, int irate, int parityNone, int idatabits, double d, boolean setRTS, boolean setDTR) throws SerialException {
+public Serial(String iname, int irate, int parityNone, int idatabits, double stopbit, boolean setRTS, boolean setDTR) throws SerialException {
 
-	init(iname, irate,  parityNone,  idatabits,  d,  setRTS, setDTR);
+	init(iname, irate,  parityNone,  idatabits,  stopbit,  setRTS, setDTR);
 	
     }
 
@@ -91,7 +91,7 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double d, 
    * Inzzializza la porta
    * @throws SerialException
    */
-  private void init(String iname, int irate, int parityNone, int idatabits, double d, boolean setRTS, boolean setDTR) throws SerialException 
+  private void init(String iname, int irate, int parityNone, int idatabits, double stopbit, boolean setRTS, boolean setDTR) throws SerialException 
  {
 	
 	  resetDecoding(StandardCharsets.UTF_8);
@@ -101,8 +101,8 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double d, 
 	    if (parityNone == 'O') parity = SerialPort.PARITY_ODD;
 
 	    int stopbits = SerialPort.STOPBITS_1;
-	    if (d == 1.5f) stopbits = SerialPort.STOPBITS_1_5;
-	    if (d == 2) stopbits = SerialPort.STOPBITS_2;
+	    if (stopbit == 1.5f) stopbits = SerialPort.STOPBITS_1_5;
+	    if (stopbit == 2) stopbits = SerialPort.STOPBITS_2;
 
 	    try {
 	      port = new SerialPort(iname);
@@ -110,7 +110,7 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double d, 
 	      boolean res = port.setParams(irate, idatabits, stopbits, parity, setRTS, setDTR);
 	      if (!res) {
 	        System.err.println(format(tr("Error while setting serial port parameters: {0} {1} {2} {3}"),
-	                                  irate, parityNone, idatabits, d));
+	                                  irate, parityNone, idatabits, stopbit));
 	      }
 	      port.addEventListener(this);
 	    } catch (SerialPortException e) {
