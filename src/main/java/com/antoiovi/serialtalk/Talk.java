@@ -27,6 +27,14 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
+import javax.swing.JToggleButton;
+import java.awt.GridLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.JSlider;
+import javax.swing.ImageIcon;
+import java.awt.event.KeyEvent;
 
 public class Talk extends JFrame {
 
@@ -104,6 +112,24 @@ public class Talk extends JFrame {
 	  private JTextArea textArea;
 	  private JButton btnClearOutput;
 	  private JScrollPane scrollPane;
+	  private JPanel panel_2;
+	  private JButton btnA;
+	  private JButton btnB;
+	  private JButton btnC;
+	  private JButton btnD;
+	  private JToggleButton tglbtnOnoff1;
+	  private JToggleButton tglbtnOnoff2;
+	  private JToggleButton tglbtnOnoff3;
+	  private JToggleButton tglbtnOnoff4;
+	  private JToggleButton tglbtnOnoff6;
+	  private JPanel panel_3;
+	  private JPanel panel_4;
+	  private JSlider slider;
+	  private JSlider slider_1;
+	  private JPanel panel_5;
+	  private JLabel lblPotenziometro;
+	  private JLabel lblPotenziometro_1;
+	  
 	  
 	/**
 	 * Launch the application.
@@ -126,12 +152,12 @@ public class Talk extends JFrame {
 	 * Create the frame.
 	 */
 	public Talk() {
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
-		getContentPane().add(panel);
+		getContentPane().add(panel, BorderLayout.NORTH);
 		
 		
  		JLabel lblPortName = new JLabel("Port Name");
@@ -164,7 +190,7 @@ public class Talk extends JFrame {
  		panel.add(chckbxDTR);
  		
  		panel_1 = new JPanel();
- 		getContentPane().add(panel_1);
+ 		getContentPane().add(panel_1, BorderLayout.SOUTH);
  		
  		btnTestConnection = new JButton("Test Connection");
  		btnTestConnection.addActionListener(new ActionListener() {
@@ -188,6 +214,67 @@ public class Talk extends JFrame {
  		
  		scrollPane = new JScrollPane(textArea);
  		getContentPane().add(scrollPane);
+ 		
+ 		panel_2 = new JPanel();
+ 		getContentPane().add(panel_2, BorderLayout.WEST);
+ 		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
+ 		
+ 		panel_3 = new JPanel();
+ 		panel_2.add(panel_3);
+ 		panel_3.setLayout(new GridLayout(3, 3, 0, 0));
+ 		
+ 		btnA = new JButton("A");
+ 		panel_3.add(btnA);
+ 		btnB = new JButton("B");
+ 		panel_3.add(btnB);
+ 		btnC = new JButton("C");
+ 		panel_3.add(btnC);
+ 		btnD = new JButton("D");
+ 		panel_3.add(btnD);
+ 		
+ 		panel_4 = new JPanel();
+ 		panel_2.add(panel_4);
+ 		panel_4.setLayout(new GridLayout(3, 2, 0, 0));
+ 		
+ 		tglbtnOnoff1 = new JToggleButton("Switch 1");
+ 		tglbtnOnoff1.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		tglbtnOnoff1.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		panel_4.add(tglbtnOnoff1);
+ 		
+ 		tglbtnOnoff2 = new JToggleButton("Switch  2");
+ 		tglbtnOnoff2.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		tglbtnOnoff2.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		
+ 		panel_4.add(tglbtnOnoff2);
+ 		
+ 		tglbtnOnoff3 = new JToggleButton("Switch 3");
+ 		tglbtnOnoff3.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		tglbtnOnoff3.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		
+ 		panel_4.add(tglbtnOnoff3);
+ 		tglbtnOnoff4 = new JToggleButton("Switch 4");
+ 		tglbtnOnoff4.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		tglbtnOnoff4.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		
+ 		panel_4.add(tglbtnOnoff4);
+ 		
+ 		panel_5 = new JPanel();
+ 		panel_2.add(panel_5);
+ 		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
+ 		
+ 		lblPotenziometro = new JLabel("Potenziometro 1");
+ 		panel_5.add(lblPotenziometro);
+ 		
+ 		slider_1 = new JSlider();
+ 		panel_5.add(slider_1);
+ 		
+ 		lblPotenziometro_1 = new JLabel("Potenziometro 2");
+ 		panel_5.add(lblPotenziometro_1);
+ 		
+ 		slider = new JSlider();
+ 		panel_5.add(slider);
+ 		
+ 		
  		init();
  
 	}
