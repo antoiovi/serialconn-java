@@ -2,6 +2,7 @@ package com.antoiovi.serialtalk;
 
 import jssc.SerialPort;
 
+import com.antoiovi.LineRecived;
 import com.antoiovi.Serial;
 
 import java.awt.EventQueue;
@@ -20,6 +21,7 @@ import javax.swing.JTextPane;
 
 import com.antoiovi.SerialException;
 import com.antoiovi.SerialRead;
+import com.antoiovi.SerialReadT;
 
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
@@ -40,27 +42,29 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JSplitPane;
+import java.awt.Component;
 
-public class Talk extends JFrame implements ActionListener{
+public class Talk extends JFrame implements ActionListener,LineRecived{
 
 	    Pair[] baud_rates ={
 		new Pair(String.valueOf(SerialPort.BAUDRATE_110)    ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_300)    ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_600)    ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_1200)   ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_4800)   ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_9600)   ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_14400)  ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_19200)  ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_38400)  ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_115200) ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_128000) ,SerialPort.BAUDRATE_110),
-		new Pair(String.valueOf(SerialPort.BAUDRATE_256000) ,SerialPort.BAUDRATE_110) 
+		new Pair(String.valueOf(SerialPort.BAUDRATE_300)    ,SerialPort.BAUDRATE_300),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_600)    ,SerialPort.BAUDRATE_600),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_1200)   ,SerialPort.BAUDRATE_1200),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_4800)   ,SerialPort.BAUDRATE_4800),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_9600)   ,SerialPort.BAUDRATE_9600),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_14400)  ,SerialPort.BAUDRATE_14400),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_19200)  ,SerialPort.BAUDRATE_19200),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_38400)  ,SerialPort.BAUDRATE_38400),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_115200) ,SerialPort.BAUDRATE_115200),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_128000) ,SerialPort.BAUDRATE_128000),
+		new Pair(String.valueOf(SerialPort.BAUDRATE_256000) ,SerialPort.BAUDRATE_256000) 
 	};
 	
 	String[] port_names ={
 			"/dev/tty0","/dev/tty1","/dev/tty2",
-			"/dev/USB0","/dev/USB1","/dev/USB2"
+			"/dev/ttyUSB0","/dev/ttyUSB1","/dev/ttyUSB2"
 		};
 	
 	Integer[] data_bits ={
@@ -114,7 +118,7 @@ public class Talk extends JFrame implements ActionListener{
 	  private JButton btnTestConnection;
 	  
 	  static Talk app;
-	  private JTextArea textArea;
+	  private JTextArea textAreaControl;
 	  private JButton btnClearOutput;
 	  private JScrollPane scrollPane;
 	  private JPanel panel_2;
@@ -134,6 +138,8 @@ public class Talk extends JFrame implements ActionListener{
 	  private JPanel panel_5;
 	  private JLabel lblPotenziometro;
 	  private JLabel lblPotenziometro_1;
+
+	private JTextArea textAreaSerial;
 	  
 	  
 	/**
@@ -225,12 +231,13 @@ public class Talk extends JFrame implements ActionListener{
  		});
  		panel_1.add(btnClearOutput);
  		
- 		textArea = new JTextArea();
- 		textArea.setEditable(false);
- 		//getContentPane().add(textArea);
- 		
- 		scrollPane = new JScrollPane(textArea);
- 		getContentPane().add(scrollPane);
+ 		btnStop = new JButton("Stop");
+ 		btnStop.addActionListener(new ActionListener() {
+ 			public void actionPerformed(ActionEvent e) {
+ 				app.Stop();
+ 			}
+ 		});
+ 		panel_1.add(btnStop);
  		
  		panel_2 = new JPanel();
  		getContentPane().add(panel_2, BorderLayout.WEST);
@@ -260,27 +267,27 @@ public class Talk extends JFrame implements ActionListener{
  		tglbtnOnoff1 = new JToggleButton("Switch 1");
  		tglbtnOnoff1.addActionListener(this);
  		tglbtnOnoff1.setActionCommand("Switch_1");
- 		tglbtnOnoff1.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
- 		tglbtnOnoff1.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		//tglbtnOnoff1.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		//tglbtnOnoff1.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
  		panel_4.add(tglbtnOnoff1);
  		
  		tglbtnOnoff2 = new JToggleButton("Switch  2");
  		tglbtnOnoff2.setActionCommand("Switch_2");
- 		tglbtnOnoff2.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
- 		tglbtnOnoff2.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		//tglbtnOnoff2.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		//tglbtnOnoff2.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
  		tglbtnOnoff2.addActionListener(this);
  		panel_4.add(tglbtnOnoff2);
  		
  		tglbtnOnoff3 = new JToggleButton("Switch 3");
  		tglbtnOnoff3.setActionCommand("Switch_3");
- 		tglbtnOnoff3.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
- 		tglbtnOnoff3.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		//tglbtnOnoff3.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		//tglbtnOnoff3.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
  		tglbtnOnoff3.addActionListener(this);
  		panel_4.add(tglbtnOnoff3);
  		tglbtnOnoff4 = new JToggleButton("Switch 4");
  		tglbtnOnoff4.setActionCommand("Switch_4");
- 		tglbtnOnoff4.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
- 		tglbtnOnoff4.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+ 		//tglbtnOnoff4.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
+ 		//tglbtnOnoff4.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
  		tglbtnOnoff4.addActionListener(this);
  		panel_4.add(tglbtnOnoff4);
  		
@@ -300,6 +307,23 @@ public class Talk extends JFrame implements ActionListener{
  		slider = new JSlider();
  		panel_5.add(slider);
  		
+ 		panel_6 = new JPanel();
+ 		getContentPane().add(panel_6, BorderLayout.CENTER);
+ 		panel_6.setLayout(new BoxLayout(panel_6, BoxLayout.Y_AXIS));
+ 		
+ 		textAreaControl = new JTextArea();
+ 		textAreaControl.setEditable(false);
+ 		//getContentPane().add(textArea);
+ 		
+ 		scrollPane = new JScrollPane(textAreaControl);
+ 		panel_6.add(scrollPane);
+ 		scrollPane.setAutoscrolls(true);
+ 		
+ 		textAreaSerial = new JTextArea();
+ 		textAreaSerial.setEditable(false);
+ 		scrollPane_1 = new JScrollPane(textAreaSerial);
+ 		scrollPane_1.setAutoscrolls(true);
+ 		panel_6.add(scrollPane_1);
  		
  		init();
  
@@ -316,24 +340,34 @@ public class Talk extends JFrame implements ActionListener{
 	}
 	
 	
-	SerialRead serial;
+	SerialReadT serial;
 	String portname ;
-	
+	private JButton btnStop;
+	private JPanel panel_6;
+	private JScrollPane scrollPane_1;
+
+ 	
 	private void testConnection() {
-		boolean test=false;
-		
-		if(serial!= null) {
-			if(serial.portIsOpened())
-				test=true;
-		}	
-		if(test) {
-			app.appendMessage("Serial port is openend :"+portname);
-		}else {
+		boolean test = false;
+
+		if (serial != null) {
+			try {
+				if (serial.portIsOpened())
+					test = true;
+				app.appendMessage("Serial Port already opened :" + portname);
+
+			} catch (Exception e) {
+				test = false;
+			}
+		}
+		if (test) {
+			app.appendMessage("Serial port is openend :" + portname);
+		} else {
 			app.appendMessage("Serial port NON opened:");
 			initConnection();
 		}
-		
-	}		
+
+	}
 	
 	
 		
@@ -348,9 +382,9 @@ public class Talk extends JFrame implements ActionListener{
 		
 		try {
 			name=(String)comboBoxPortname.getSelectedItem();
-			
-			Pair p=(Pair)comboBoxBaudrate.getSelectedItem();
+ 			Pair p=(Pair)comboBoxBaudrate.getSelectedItem();
 			baudrate=p.value.intValue();
+		
 			p=(Pair)comboBoxParityBits.getSelectedItem();
 			parity=p.value.intValue();
 			
@@ -360,20 +394,18 @@ public class Talk extends JFrame implements ActionListener{
 			setRTS=	chckbxDTR.isSelected();
 			setDTR=chckbxRTS.isSelected();
 					
-			serial = new SerialRead( name, baudrate, parity, databits, stopbit,  setRTS,  setDTR); 
+			serial = new SerialReadT( name, baudrate, parity, databits, stopbit,  setRTS,  setDTR); 
+			//serial = new SerialReadT( name); 
+ 			serial.setLineRecived(app);
 			//throws SerialException {
 
  			if (serial.portIsOpened()) {
+ 				
  				portname=name;
  				app.appendMessage("Porta aperta :");
 				TimeUnit.SECONDS.sleep(1);
 				app.appendMessage("Lettura dati ... :");
-
-				 
-				//readString();
-				app.appendMessage("Chiusura porta seriale :");
-
- 				serial.dispose();
+		      
 
 			} else
 				System.out.println("Porta NON e aperta !!!");
@@ -393,25 +425,46 @@ public class Talk extends JFrame implements ActionListener{
 		}
 	}
 	
+	void Stop() {
+		try {
+			serial.dispose();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	void appendMessage(String str) {
-		textArea.append(str);
-		textArea.append("\n");
+		textAreaControl.append(str);
+		textAreaControl.append("\n");
+ 
+	}
+	
+	void printLineRecived(String str) {
+		textAreaSerial.append(str);
+		textAreaSerial.append("\n");
 
 	}
 	
 	void clearOutput() {
-		textArea.setText("");
+		textAreaControl.setText("");
+		textAreaSerial.setText("");
 		
 	}
 	
 	
 	void writeToSerial(String str) {
-		
+		try {
+		serial.write(str);
+		appendMessage("Scritto con succcesso");
+
+		}catch(Exception e) {
+			appendMessage("Errore scrivendo sulla porta");
+		}
 	}
 	
-	void readFromSerial(String msg) {
-			appendMessage(msg);
+	synchronized	void readFromSerial(String msg) {
+			printLineRecived(msg);
 
 	}
 	
@@ -449,6 +502,16 @@ public class Talk extends JFrame implements ActionListener{
 
 			writeToSerial(msg);	
 	}
-	
 
+	/**
+	 * Parametro ricevuto da lettura porta
+	 * @param line
+	 */
+	synchronized public void setMessage(String line) {
+		readFromSerial(line);
+	}
+	
+	void log(String msg) {
+		System.out.println(msg);
+	}
 }

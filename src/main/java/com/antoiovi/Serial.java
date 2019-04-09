@@ -94,6 +94,15 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double sto
   private void init(String iname, int irate, int parityNone, int idatabits, double stopbit, boolean setRTS, boolean setDTR) throws SerialException 
  {
 	
+	  log(name);
+	  log(Integer.toString(irate));
+	  log(Integer.toString(parityNone));
+	  log(Integer.toString(idatabits));
+	  log(Double.toString(stopbit));
+	  log(Boolean.toString(setRTS));
+	  log(Boolean.toString(setDTR));
+	  
+	  
 	  resetDecoding(StandardCharsets.UTF_8);
 
 	    int parity = SerialPort.PARITY_NONE;
@@ -287,7 +296,7 @@ public boolean portIsOpened(){
 	  }
   
   void log(String msg){
-	  //System.out.println(msg);
+	//  System.out.println(msg);
   }
   
 }

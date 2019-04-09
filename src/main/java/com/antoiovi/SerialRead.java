@@ -45,6 +45,7 @@ public class SerialRead extends Serial {
 	@Override
 	protected void message(char[] chars, int length) {
 		String line = String.valueOf(chars);
+		System.out.println("lINE=: "+line);
 		if (buffer.size() == MAX_BUFFER)
 			buffer.remove(0);
 		if (line == null)
