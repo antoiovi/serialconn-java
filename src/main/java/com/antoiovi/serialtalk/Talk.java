@@ -45,7 +45,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JSplitPane;
 import java.awt.Component;
 
-public class Talk extends JFrame implements ActionListener,LineRecived{
+public class Talk extends JFrame implements ActionListener,LineRecived,ChangeListener{
 
 	    Pair[] baud_rates ={
 		new Pair(String.valueOf(SerialPort.BAUDRATE_110)    ,SerialPort.BAUDRATE_110),
@@ -133,7 +133,6 @@ public class Talk extends JFrame implements ActionListener,LineRecived{
 	  private JToggleButton tglbtnOnoff6;
 	  private JPanel panel_3;
 	  private JPanel panel_4;
-	  private JSlider slider;
 	  private JSlider slider_1;
 	  private JPanel panel_5;
 	  private JLabel lblPotenziometro;
@@ -299,13 +298,18 @@ public class Talk extends JFrame implements ActionListener,LineRecived{
  		panel_5.add(lblPotenziometro);
  		
  		slider_1 = new JSlider();
+ 		slider_1.setName("TRIM1");
+ 		slider_1.addChangeListener(this);
  		panel_5.add(slider_1);
  		
  		lblPotenziometro_1 = new JLabel("Potenziometro 2");
  		panel_5.add(lblPotenziometro_1);
  		
- 		slider = new JSlider();
- 		panel_5.add(slider);
+ 		slider_2 = new JSlider();
+ 		slider_2.setName("TRIM2");
+ 		slider_2.addChangeListener(this);
+
+ 		panel_5.add(slider_2);
  		
  		panel_6 = new JPanel();
  		getContentPane().add(panel_6, BorderLayout.CENTER);
@@ -345,6 +349,7 @@ public class Talk extends JFrame implements ActionListener,LineRecived{
 	private JButton btnStop;
 	private JPanel panel_6;
 	private JScrollPane scrollPane_1;
+	private JSlider slider_2;
 
  	
 	private void testConnection() {
@@ -498,6 +503,9 @@ public class Talk extends JFrame implements ActionListener,LineRecived{
 				else
 				msg=msg+"-OFF";
 		}
+		if(msg.equals("slide_1") || msg.equals("slide_2") ) {
+			
+		}
 		app.appendMessage("Write to serial : "+msg);
 
 			writeToSerial(msg);	
@@ -513,5 +521,17 @@ public class Talk extends JFrame implements ActionListener,LineRecived{
 	
 	void log(String msg) {
 		System.out.println(msg);
+	}
+
+	/*
+	 * ChangeListener : for Sliders
+	 */
+	public void stateChanged(ChangeEvent e) {
+		 JSlider source = (JSlider)e.getSource();
+		 log(source.getName());
+		    if (!source.getValueIsAdjusting()) {
+		        int value = (int)source.getValue();
+		        writeToSerial(source.getName()+":"+String.valueOf(value));
+		    }		
 	}
 }
