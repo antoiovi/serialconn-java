@@ -21,6 +21,7 @@ import javax.swing.JTextPane;
 import com.antoiovi.SerialException;
 import com.antoiovi.SerialRead;
 
+import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -35,8 +36,12 @@ import java.awt.Insets;
 import javax.swing.JSlider;
 import javax.swing.ImageIcon;
 import java.awt.event.KeyEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
-public class Talk extends JFrame {
+public class Talk extends JFrame implements ActionListener{
 
 	    Pair[] baud_rates ={
 		new Pair(String.valueOf(SerialPort.BAUDRATE_110)    ,SerialPort.BAUDRATE_110),
@@ -152,6 +157,18 @@ public class Talk extends JFrame {
 	 * Create the frame.
 	 */
 	public Talk() {
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+			try {
+				if(serial!=null)
+				serial.dispose();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			}
+		});
 		setBounds(100, 100, 450, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
@@ -224,38 +241,47 @@ public class Talk extends JFrame {
  		panel_3.setLayout(new GridLayout(3, 3, 0, 0));
  		
  		btnA = new JButton("A");
+ 		btnA.addActionListener(this);
  		panel_3.add(btnA);
  		btnB = new JButton("B");
+ 		btnB.addActionListener(this);
  		panel_3.add(btnB);
  		btnC = new JButton("C");
+ 		btnC.addActionListener(this);
  		panel_3.add(btnC);
  		btnD = new JButton("D");
  		panel_3.add(btnD);
+ 		btnD.addActionListener(this);
  		
  		panel_4 = new JPanel();
  		panel_2.add(panel_4);
  		panel_4.setLayout(new GridLayout(3, 2, 0, 0));
  		
  		tglbtnOnoff1 = new JToggleButton("Switch 1");
+ 		tglbtnOnoff1.addActionListener(this);
+ 		tglbtnOnoff1.setActionCommand("Switch_1");
  		tglbtnOnoff1.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
  		tglbtnOnoff1.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
  		panel_4.add(tglbtnOnoff1);
  		
  		tglbtnOnoff2 = new JToggleButton("Switch  2");
+ 		tglbtnOnoff2.setActionCommand("Switch_2");
  		tglbtnOnoff2.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
  		tglbtnOnoff2.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
- 		
+ 		tglbtnOnoff2.addActionListener(this);
  		panel_4.add(tglbtnOnoff2);
  		
  		tglbtnOnoff3 = new JToggleButton("Switch 3");
+ 		tglbtnOnoff3.setActionCommand("Switch_3");
  		tglbtnOnoff3.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
  		tglbtnOnoff3.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
- 		
+ 		tglbtnOnoff3.addActionListener(this);
  		panel_4.add(tglbtnOnoff3);
  		tglbtnOnoff4 = new JToggleButton("Switch 4");
+ 		tglbtnOnoff4.setActionCommand("Switch_4");
  		tglbtnOnoff4.setIcon(new ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
  		tglbtnOnoff4.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
- 		
+ 		tglbtnOnoff4.addActionListener(this);
  		panel_4.add(tglbtnOnoff4);
  		
  		panel_5 = new JPanel();
@@ -289,9 +315,30 @@ public class Talk extends JFrame {
 	chckbxRTS.setSelected(true);
 	}
 	
+	
+	SerialRead serial;
+	String portname ;
+	
 	private void testConnection() {
-		String name = "/dev/ttyUSB0";
-		Serial serial;
+		boolean test=false;
+		
+		if(serial!= null) {
+			if(serial.portIsOpened())
+				test=true;
+		}	
+		if(test) {
+			app.appendMessage("Serial port is openend :"+portname);
+		}else {
+			app.appendMessage("Serial port NON opened:");
+			initConnection();
+		}
+		
+	}		
+	
+	
+		
+	private void initConnection() {
+		String name;
 		int baudrate;
 		int parity;
 		int databits;
@@ -301,7 +348,7 @@ public class Talk extends JFrame {
 		
 		try {
 			name=(String)comboBoxPortname.getSelectedItem();
-
+			
 			Pair p=(Pair)comboBoxBaudrate.getSelectedItem();
 			baudrate=p.value.intValue();
 			p=(Pair)comboBoxParityBits.getSelectedItem();
@@ -313,17 +360,18 @@ public class Talk extends JFrame {
 			setRTS=	chckbxDTR.isSelected();
 			setDTR=chckbxRTS.isSelected();
 					
-			serial = new Serial( name, baudrate, parity, databits, stopbit,  setRTS,  setDTR); 
+			serial = new SerialRead( name, baudrate, parity, databits, stopbit,  setRTS,  setDTR); 
 			//throws SerialException {
 
  			if (serial.portIsOpened()) {
+ 				portname=name;
  				app.appendMessage("Porta aperta :");
 				TimeUnit.SECONDS.sleep(1);
 				app.appendMessage("Lettura dati ... :");
 
 				 
 				//readString();
-				app.appendMessage("Chiusyra porta seriale :");
+				app.appendMessage("Chiusura porta seriale :");
 
  				serial.dispose();
 
@@ -345,6 +393,7 @@ public class Talk extends JFrame {
 		}
 	}
 	
+	
 	void appendMessage(String str) {
 		textArea.append(str);
 		textArea.append("\n");
@@ -355,6 +404,17 @@ public class Talk extends JFrame {
 		textArea.setText("");
 		
 	}
+	
+	
+	void writeToSerial(String str) {
+		
+	}
+	
+	void readFromSerial(String msg) {
+			appendMessage(msg);
+
+	}
+	
 	
 	private class Pair{
 		String name;
@@ -372,4 +432,23 @@ public class Talk extends JFrame {
 		}
 		
 	}
+
+/**
+ *  Buttons , ToggleButtons
+ */
+	public void actionPerformed(ActionEvent e) {
+		String msg=e.getActionCommand();
+		if(msg.equals("Switch_1") || msg.equals("Switch_2") || msg.equals("Switch_3")|| msg.equals("Switch_4")){
+			AbstractButton abstractButton = (AbstractButton) e.getSource();
+			if( abstractButton.getModel().isSelected())
+				msg=msg+"-ON";
+				else
+				msg=msg+"-OFF";
+		}
+		app.appendMessage("Write to serial : "+msg);
+
+			writeToSerial(msg);	
+	}
+	
+
 }

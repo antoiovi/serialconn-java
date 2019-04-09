@@ -48,11 +48,10 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortTimeoutException;
 
-
 public class App {
 	String name = "/dev/ttyUSB0";
 	SerialRead serial;
- 
+
 	public static void main(String[] args) {
 		System.out.println("Hello World!");
 		App p = new App();
@@ -60,7 +59,7 @@ public class App {
 	}
 
 	private void init() {
-		
+
 		try {
 
 			serial = new SerialRead(name);
@@ -68,7 +67,7 @@ public class App {
 				System.out.println("Porta e apera..");
 				TimeUnit.SECONDS.sleep(1);
 				System.out.println("Lettura dati ..");
-				
+
 				readString();
 
 				System.out.println("Chiusura porta seriale..");
@@ -79,19 +78,19 @@ public class App {
 		} catch (SerialException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
- 			e.printStackTrace();
+			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// Timeunit.Seconds.sleep(..) exception
- 			e.printStackTrace();
+			e.printStackTrace();
 		}
- 	}
+	}
 
 	/**
 	 * Legge un certo numero di righe e poi chiude l'applicazione
 	 * 
 	 */
-	
-	private void readString() throws  InterruptedException {
+
+	private void readString() throws InterruptedException {
 		int count = 0;
 		do {
 			count++;
@@ -102,5 +101,4 @@ public class App {
 
 	}
 
-     
 }
