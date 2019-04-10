@@ -1,4 +1,4 @@
-package com.antoiovi;
+package com.antoiovi.serial;
 
 public interface LineRecived {
 

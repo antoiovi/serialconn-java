@@ -1,4 +1,4 @@
-package com.antoiovi;
+package com.antoiovi.serial;
 
  @SuppressWarnings("serial")
 public class SerialNotFoundException extends SerialException {

@@ -44,13 +44,15 @@ package com.antoiovi;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import jssc.SerialPort;
-import jssc.SerialPortException;
-import jssc.SerialPortTimeoutException;
+import com.antoiovi.serial.LineRecived;
+import com.antoiovi.serial.Serial;
+import com.antoiovi.serial.SerialException;
 
-public class App {
+
+
+public class App implements LineRecived{
 	String name = "/dev/ttyUSB0";
-	SerialRead serial;
+	Serial serial;
 
 	public static void main(String[] args) {
 		System.out.println("Hello World!");
@@ -62,7 +64,9 @@ public class App {
 
 		try {
 
-			serial = new SerialRead(name);
+			serial = new Serial(name);
+			serial.setLineRecived(this);
+			
 			if (serial.portIsOpened()) {
 				System.out.println("Porta e apera..");
 				TimeUnit.SECONDS.sleep(1);
@@ -89,16 +93,29 @@ public class App {
 	 * Legge un certo numero di righe e poi chiude l'applicazione
 	 * 
 	 */
-
+String message=null;
 	private void readString() throws InterruptedException {
 		int count = 0;
 		do {
-			count++;
 			TimeUnit.SECONDS.sleep(2);
-			String msg = serial.getFirst();
-			System.out.println(msg);
+			if(this.getMessage()==null) continue;
+			count++;
+			System.out.println(message);
+			this.setMessage(null);
 		} while (count < 10);
 
 	}
+	/**
+	 * Recive message from serial
+	 */
+	public void setMessage(String line) {
+		this.message=line;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	
 
 }

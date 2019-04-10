@@ -68,7 +68,7 @@
 	</build>
 	<profiles>
     <profile>
-      <id>profile-1</id>
+      <id>talk</id>
       <build>
 	<plugins>
 			<!-- maven-jar-plugin : per impostare la classe main -->
@@ -91,7 +91,7 @@
 	</build>
     </profile>
 <profile>
-      <id>profile-2</id>
+      <id>readserial</id>
       <build>
 	<plugins>
 			<!-- maven-jar-plugin : per impostare la classe main -->

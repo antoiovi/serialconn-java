@@ -2,9 +2,6 @@ package com.antoiovi.serialtalk;
 
 import jssc.SerialPort;
 
-import com.antoiovi.LineRecived;
-import com.antoiovi.Serial;
-
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -18,11 +15,6 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-
-import com.antoiovi.SerialException;
-import com.antoiovi.SerialRead;
-import com.antoiovi.SerialReadT;
-
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionListener;
@@ -32,18 +24,19 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import java.awt.GridLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
+ 
 import javax.swing.JSlider;
-import javax.swing.ImageIcon;
-import java.awt.event.KeyEvent;
+ 
 import javax.swing.event.ChangeListener;
+
+import com.antoiovi.serial.LineRecived;
+import com.antoiovi.serial.Serial;
+import com.antoiovi.serial.SerialException;
+
 import javax.swing.event.ChangeEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import javax.swing.JSplitPane;
-import java.awt.Component;
+ 
 
 public class Talk extends JFrame implements ActionListener,LineRecived,ChangeListener{
 
@@ -130,7 +123,6 @@ public class Talk extends JFrame implements ActionListener,LineRecived,ChangeLis
 	  private JToggleButton tglbtnOnoff2;
 	  private JToggleButton tglbtnOnoff3;
 	  private JToggleButton tglbtnOnoff4;
-	  private JToggleButton tglbtnOnoff6;
 	  private JPanel panel_3;
 	  private JPanel panel_4;
 	  private JSlider slider_1;
@@ -344,7 +336,7 @@ public class Talk extends JFrame implements ActionListener,LineRecived,ChangeLis
 	}
 	
 	
-	SerialReadT serial;
+	Serial serial;
 	String portname ;
 	private JButton btnStop;
 	private JPanel panel_6;
@@ -399,7 +391,7 @@ public class Talk extends JFrame implements ActionListener,LineRecived,ChangeLis
 			setRTS=	chckbxDTR.isSelected();
 			setDTR=chckbxRTS.isSelected();
 					
-			serial = new SerialReadT( name, baudrate, parity, databits, stopbit,  setRTS,  setDTR); 
+			serial = new Serial( name, baudrate, parity, databits, stopbit,  setRTS,  setDTR); 
 			//serial = new SerialReadT( name); 
  			serial.setLineRecived(app);
 			//throws SerialException {

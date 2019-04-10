@@ -15,7 +15,7 @@
  */
 
 
-package com.antoiovi;
+package com.antoiovi.serial;
 
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
@@ -36,6 +36,9 @@ public class Serial implements SerialPortEventListener {
 
   private SerialPort port;
 
+  LineRecived lineRecived;
+
+  
   private CharsetDecoder bytesToStrings;
   private static final int IN_BUFFER_CAPACITY = 128;
   private static final int OUT_BUFFER_CAPACITY = 128;
@@ -94,13 +97,13 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double sto
   private void init(String iname, int irate, int parityNone, int idatabits, double stopbit, boolean setRTS, boolean setDTR) throws SerialException 
  {
 	
-	  log(name);
+	/*  log(name);
 	  log(Integer.toString(irate));
 	  log(Integer.toString(parityNone));
 	  log(Integer.toString(idatabits));
 	  log(Double.toString(stopbit));
 	  log(Boolean.toString(setRTS));
-	  log(Boolean.toString(setDTR));
+	  log(Boolean.toString(setDTR));*/
 	  
 	  
 	  resetDecoding(StandardCharsets.UTF_8);
@@ -197,12 +200,13 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double sto
   }
 
   /**
-   * Metodo da socrascrivere per effettuare la lettura della serial port
    * @param chars
    * @param length
    */
   protected void message(char[] chars, int length) {
-	  }
+	  String line = String.valueOf(chars);
+		lineRecived.setMessage(line);
+ 	  }
 
 
 
@@ -298,5 +302,8 @@ public boolean portIsOpened(){
   void log(String msg){
 	//  System.out.println(msg);
   }
+public void setLineRecived(LineRecived lineRecived) {
+	this.lineRecived = lineRecived;
+}
   
 }

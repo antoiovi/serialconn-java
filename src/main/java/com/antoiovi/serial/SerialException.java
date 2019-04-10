@@ -1,4 +1,4 @@
-package com.antoiovi;
+package com.antoiovi.serial;
 
 import java.io.IOException;
 
