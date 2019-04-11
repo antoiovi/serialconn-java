@@ -22,15 +22,18 @@ La mia pagina di riferimento dove viene spiagto il codice :
   
  Compilazione con maven per l'applicazione di prova : 
  			
-	serialconn-java$ mvn clean package -P readserial
+	serialconn-java$ mvn   package -P readserial
  
  Compilazione con maven per l'applicazione con gui Talk : 
  		
-	serialconn-java$ mvn clean package -P talk
+	serialconn-java$ mvn   package -P talk
  		
  Esecuzione :
 		
-		serialconn-java$ java -jar target/serial-1.jar 		
+		serialconn-java$ java -jar target/Readserial.jar 	
+		
+		serialconn-java$ java -jar target/Talk.jar 	
+			
 
 #### Utenti Linux
   
