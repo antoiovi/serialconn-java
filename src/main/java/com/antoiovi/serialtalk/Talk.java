@@ -37,6 +37,7 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.ImageIcon;
 
 public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener {
 
@@ -242,15 +243,19 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_4.setLayout(new GridLayout(3, 2, 0, 0));
 
 		tglbtnOnoff1 = new JToggleButton("Switch 1");
+	//	tglbtnOnoff1.setSelectedIcon(new ImageIcon(Talk.class.getResource("/com/antoiovi/serialtalk/ON.png")));
+	//	tglbtnOnoff1.setIcon(new ImageIcon(Talk.class.getResource("/com/antoiovi/serialtalk/OFF.png")));
+ 		//tglbtnOnoff1.setIcon(new ImageIcon(getClass().getResource("/com/antoiovi/icons/switch-off-icon.png")));
+		
 		tglbtnOnoff1.addActionListener(this);
 		tglbtnOnoff1.setActionCommand("Switch_1");
-		// tglbtnOnoff1.setIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
-		// tglbtnOnoff1.setSelectedIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+	//	 tglbtnOnoff1.setIcon(new ImageIcon(Talk.class.getResource("/com/antoiovi/icons/switch-on-icon.png")));
+		// tglbtnOnoff1.setSelectedIcon(new ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
 		panel_4.add(tglbtnOnoff1);
 
 		tglbtnOnoff2 = new JToggleButton("Switch  2");
+		
+		 
 		tglbtnOnoff2.setActionCommand("Switch_2");
 		// tglbtnOnoff2.setIcon(new
 		// ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
@@ -260,6 +265,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_4.add(tglbtnOnoff2);
 
 		tglbtnOnoff3 = new JToggleButton("Switch 3");
+		
 		tglbtnOnoff3.setActionCommand("Switch_3");
 		// tglbtnOnoff3.setIcon(new
 		// ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
@@ -268,6 +274,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		tglbtnOnoff3.addActionListener(this);
 		panel_4.add(tglbtnOnoff3);
 		tglbtnOnoff4 = new JToggleButton("Switch 4");
+	
 		tglbtnOnoff4.setActionCommand("Switch_4");
 		// tglbtnOnoff4.setIcon(new
 		// ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
@@ -280,7 +287,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_2.add(panel_5);
 		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
 
-		lblPotenziometro = new JLabel("Potenziometro 1");
+		lblPotenziometro = new JLabel("Trimmer 1");
 		panel_5.add(lblPotenziometro);
 
 		slider_1 = new JSlider();
@@ -288,7 +295,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		slider_1.addChangeListener(this);
 		panel_5.add(slider_1);
 
-		lblPotenziometro_1 = new JLabel("Potenziometro 2");
+		lblPotenziometro_1 = new JLabel("Trimmer 2");
 		panel_5.add(lblPotenziometro_1);
 
 		slider_2 = new JSlider();
@@ -324,6 +331,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		comboBoxParityBits.setSelectedItem(parity_options[PARITY_NONE]);
 		chckbxDTR.setSelected(true);
 		chckbxRTS.setSelected(true);
+		this.appendMessage("Author : antoiovi 2019 ");
 	}
 
 	private void testConnection() {
