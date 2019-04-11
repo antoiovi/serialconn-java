@@ -300,19 +300,19 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		
 		panel_6 = new JPanel();
  		getContentPane().add(panel_6, BorderLayout.CENTER);
- 		panel_6.setLayout(new BoxLayout(panel_6, BoxLayout.Y_AXIS));
+ 		panel_6.setLayout(new GridLayout(2, 1, 0, 0));
  		
  		textAreaControl = new JTextArea();
  		textAreaControl.setEditable(false);
-  		
+ 		
  		scrollPane = new JScrollPane(textAreaControl);
  		panel_6.add(scrollPane);
  		scrollPane.setAutoscrolls(true);
  		
  		textAreaSerial = new JTextArea();
  		scrollPane_1 = new JScrollPane(textAreaSerial);
- 		scrollPane_1.setAutoscrolls(true);
  		panel_6.add(scrollPane_1);
+ 		scrollPane_1.setAutoscrolls(true);
 		init();
 
 	}
@@ -492,7 +492,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	void log(String msg) {
-		System.out.println(msg);
+	//	System.out.println(msg);
 	}
 
 	/*
