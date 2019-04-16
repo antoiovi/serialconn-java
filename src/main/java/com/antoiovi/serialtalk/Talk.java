@@ -28,6 +28,8 @@ import java.awt.GridLayout;
 import javax.swing.JSlider;
 
 import javax.swing.event.ChangeListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import com.antoiovi.serial.LineRecived;
 import com.antoiovi.serial.Serial;
@@ -37,9 +39,18 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.ImageIcon;
 
-public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener {
+//Added to copy to clipboard jpanel content
+import java.awt.datatransfer.*;
+import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+
+public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener  {
 
 	Pair[] baud_rates = { new Pair(String.valueOf(SerialPort.BAUDRATE_110), SerialPort.BAUDRATE_110),
 			new Pair(String.valueOf(SerialPort.BAUDRATE_300), SerialPort.BAUDRATE_300),
@@ -120,6 +131,13 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	Serial serial;
 	String portname;
+	private JPopupMenu popupMenu;
+	private JMenuItem mntmCopyAllToClipboard;
+
+	private JMenuItem mntmCopySelToClipboard;
+	static final String COPY_SEL_TO_CLIPBOARD="CopySelToClipboard";
+	static final String COPY_ALL_TO_CLIPBOARD="CopyAllToClipboard";
+
 
 	/**
 	 * Launch the application.
@@ -317,10 +335,33 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
  		scrollPane.setAutoscrolls(true);
  		
  		textAreaSerial = new JTextArea();
+		textAreaSerial.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+						app.popupMenu.show(textAreaSerial, e.getX(), e.getY());
+				}
+			}
+		});
  		scrollPane_1 = new JScrollPane(textAreaSerial);
  		panel_6.add(scrollPane_1);
  		scrollPane_1.setAutoscrolls(true);
-		init();
+
+ 		//PopUp menu to copy serial data to clipboard 		
+ 		mntmCopyAllToClipboard = new JMenuItem("Copy all");
+ 		mntmCopyAllToClipboard.addActionListener(this);
+ 		mntmCopyAllToClipboard.setActionCommand(COPY_ALL_TO_CLIPBOARD);
+ 		mntmCopySelToClipboard = new JMenuItem("Copy selected");
+ 		mntmCopySelToClipboard.addActionListener(this);
+ 		mntmCopySelToClipboard.setActionCommand(COPY_SEL_TO_CLIPBOARD);
+ 		
+ 		popupMenu = new JPopupMenu();
+ 		popupMenu.add(mntmCopyAllToClipboard);
+ 		popupMenu.add(mntmCopySelToClipboard);
+
+ 	    popupMenu.addPopupMenuListener(new PopupPrintListener());
+ 		
+ 	    init();
 
 	}
 
@@ -471,7 +512,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	/**
-	 * Buttons , ToggleButtons
+	 * Buttons , ToggleButtons, Popup menu (right mouse click)
 	 */
 	public void actionPerformed(ActionEvent e) {
 		String msg = e.getActionCommand();
@@ -481,13 +522,30 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 				msg = msg + "-ON";
 			else
 				msg = msg + "-OFF";
-		}
-		if (msg.equals("slide_1") || msg.equals("slide_2")) {
-
-		}
 		app.appendMessage("Write to serial : " + msg);
-
 		writeToSerial(msg);
+		}else if
+		(     msg.equals(btnA.getActionCommand()) || msg.equals(btnB.getActionCommand()) ||
+				msg.equals(btnC.getActionCommand()) ||	msg.equals(btnD.getActionCommand() )
+		)
+		{
+			app.appendMessage("Write to serial : " + msg);
+			writeToSerial(msg);
+		}
+		else if(msg.equals(COPY_ALL_TO_CLIPBOARD)) {
+	
+			String myString =textAreaSerial.getText();
+			StringSelection stringSelection = new StringSelection(myString);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(stringSelection, null);
+		}else if(msg.equals(COPY_SEL_TO_CLIPBOARD)) {
+	
+			String myString =textAreaSerial.getSelectedText();
+			StringSelection stringSelection = new StringSelection(myString);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(stringSelection, null);
+		}
+		
 	}
 
 	/**
@@ -511,7 +569,26 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		log(source.getName());
 		if (!source.getValueIsAdjusting()) {
 			int value = (int) source.getValue();
-			writeToSerial(source.getName() + ":" + String.valueOf(value));
-		}
+			String msg=source.getName() + ":" + String.valueOf(value);
+			app.appendMessage("Writing to serial : " + msg);
+			writeToSerial(msg);
+ 		}
 	}
+
+	  // An inner class to show when popup events occur
+	  class PopupPrintListener implements PopupMenuListener {
+
+		public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+ 			
+		}
+
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+ 			
+		}
+
+		public void popupMenuCanceled(PopupMenuEvent e) {
+ 			
+		}
+	  
+	  }
 }
