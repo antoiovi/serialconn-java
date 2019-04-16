@@ -49,6 +49,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JTextField;
 
 public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener  {
 
@@ -137,6 +138,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JMenuItem mntmCopySelToClipboard;
 	static final String COPY_SEL_TO_CLIPBOARD="CopySelToClipboard";
 	static final String COPY_ALL_TO_CLIPBOARD="CopyAllToClipboard";
+	static final String SEND_STRING_TO_SERIAL="Send to serial";
+
+	private JPanel panel_7;
+	private JButton btnSendString;
+	private JTextField textToSend;
 
 
 	/**
@@ -321,6 +327,19 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		slider_2.addChangeListener(this);
 
 		panel_5.add(slider_2);
+		
+		panel_7 = new JPanel();
+		panel_5.add(panel_7);
+		panel_7.setLayout(new GridLayout(4, 1, 0, 0));
+		
+		btnSendString = new JButton("Send string");
+		btnSendString.addActionListener(this);
+		btnSendString.setActionCommand(SEND_STRING_TO_SERIAL);
+		panel_7.add(btnSendString);
+		
+		textToSend = new JTextField();
+		panel_7.add(textToSend);
+		textToSend.setColumns(10);
 		
 		
 		panel_6 = new JPanel();
@@ -544,8 +563,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			StringSelection stringSelection = new StringSelection(myString);
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(stringSelection, null);
+		}else if(msg.equals(SEND_STRING_TO_SERIAL)) {
+			
+			app.appendMessage("Writing to serial : " + textToSend.getText());
+			writeToSerial(textToSend.getText());
 		}
-		
 	}
 
 	/**
