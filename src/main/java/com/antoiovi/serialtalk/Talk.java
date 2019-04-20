@@ -486,7 +486,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	void printLineRecived(String str) {
 		textAreaSerial.append(str);
-		textAreaSerial.append("\n");
+		//textAreaSerial.append("\n");
 		//Added to force Autoscroll of JPanel
 		textAreaSerial.selectAll();
 
@@ -501,6 +501,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	void writeToSerial(String str) {
 		try {
 			serial.write(str);
+			// Add new line to string 
+			serial.write('\n');
 			appendMessage("Scritto con succcesso");
 
 		} catch (Exception e) {
@@ -550,6 +552,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		{
 			app.appendMessage("Write to serial : " + msg);
 			writeToSerial(msg);
+			
 		}
 		else if(msg.equals(COPY_ALL_TO_CLIPBOARD)) {
 	

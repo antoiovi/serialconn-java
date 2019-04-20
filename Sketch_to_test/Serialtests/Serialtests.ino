@@ -1,46 +1,63 @@
 
 int BAUDRATE=9600;
-int count=0;
+char buf[80];
 
 void setup() {
 Serial.begin(BAUDRATE);
 }
 
-void loop() {
+int readline(int readch, char *buffer, int len) {
+    static int pos = 0;
+    int rpos;
+          //   Serial.print(buffer[pos]);
+            // Serial.print("OLA...");
 
+    if (readch > 0) {
+             //  Serial.print(String(readch));
 
-
-count++;
-
-  if ( Serial.available() > 0 ) {
-    // Read the incoming byte
-    char theChar = Serial.read();
-    String str=Serial.readString();
-      // Parse character
-    switch (theChar) {
-      case 'A':     
-       Serial.println("Ricevuto A");
-        break;
-      case 'B':      
-       Serial.println("Ricevuto B");
-       
-        break;
-      case 'C':   
-       Serial.println("Ricevuto C");
-        break;
-
-      case 'D': 
-             Serial.println("Ricevuto D");
-          break;
-
+        switch (readch) {
+            case '\r': // Ignore CR
+                break;
+            case '\n': // Return on new-line
+              //  buffer[pos++] = readch;
+               // buffer[pos] = 0;
+                rpos = pos;
+                pos = 0;  // Reset position index ready for next time
+               // Serial.print('\n');
+                return rpos;
+                
+            default:
+                if (pos < len-1) {
+                    buffer[pos++] = readch;
+                    buffer[pos] = 0;
+                }
+        }
     }
-                 Serial.println(str);
-
-  }
-      delay(1000);                      
-   
-   Serial.println("Ciao. ");
-
- if(count==100) 
-      count=0;
+    return 0;
 }
+
+void loop() {
+if (readline(Serial.read(), buf, 80) > 0) {
+         String str=String(buf);
+      if(str=="A"){
+      
+             Serial.println("Ricevuto_A");
+
+      }else if(str=="B"){
+               Serial.println("Ricevuto_B");
+      }else if(str=="C"){
+              Serial.println("Ricevuto_C");
+      }else if(str=="D"){
+              Serial.println("Ricevuto_C");
+      }else{
+              Serial.println("RICEVUTO... :"+str);
+     }
+ 
+     
+    }
+
+/************************************************/
+      delay(10);                      
+}
+
+
