@@ -204,7 +204,7 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double sto
    * @param length
    */
   protected void message(char[] chars, int length) {
-	  String line = String.valueOf(chars);
+		String line = String.valueOf(String.valueOf(chars,0,length));
 		lineRecived.setMessage(line);
  	  }
 
