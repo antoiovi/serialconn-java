@@ -22,8 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-
-
 package com.antoiovi.serialtalk;
 
 import jssc.SerialPort;
@@ -103,7 +101,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			new Pair(String.valueOf(SerialPort.BAUDRATE_128000), SerialPort.BAUDRATE_128000),
 			new Pair(String.valueOf(SerialPort.BAUDRATE_256000), SerialPort.BAUDRATE_256000) };
 
-	String[] port_names = { "/dev/ttyS0", "/dev/tty0", "/dev/tty1", "/dev/tty2", "/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2" };
+	String[] port_names = { "/dev/ttyS0", "/dev/ttyS1", "/dev/ttyS2", "/dev/tty0", "/dev/tty1", "/dev/tty2",
+			"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2" };
 
 	Integer[] data_bits = { SerialPort.DATABITS_5, SerialPort.DATABITS_6, SerialPort.DATABITS_7,
 			SerialPort.DATABITS_8 };
@@ -182,17 +181,16 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JTextField textToSend;
 	private JPanel panel_8;
 	private JPanel panel_9;
-	private JLabel label;
+
 	private JCheckBox chckbxWriteToFile;
-
-	PrintWriter outFile;
-	
-	String WorkingDir;
-
 	private JButton btnOpen;
-
 	private JCheckBox chckbxLogDebug;
 
+	PrintWriter outFile;
+
+	String WorkingDir;
+
+	String today;
 
 	/**
 	 * Launch the application.
@@ -219,7 +217,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			@Override
 			public void windowClosing(WindowEvent e) {
 				try {
-					log("windowClosing(WindowEvent e)","Closing application.. ",logFile );
+					log("windowClosing(WindowEvent e)", "Closing application.. ", logFile);
 
 					if (serial != null)
 						serial.dispose();
@@ -233,10 +231,13 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 				}
 			}
 		});
-		setBounds(100, 100, 550, 500);
+		setBounds(100, 100, 650, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
+		/**
+		 * Panel : configuration components (NORTH)
+		 */
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.NORTH);
 
@@ -269,105 +270,102 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		chckbxDTR = new JCheckBox("DTR");
 		panel.add(chckbxDTR);
 
+		/**
+		 * PANEL_1: COMMANDS COMPONENTS (SOUTH)
+		 */
+
 		panel_1 = new JPanel();
 		getContentPane().add(panel_1, BorderLayout.SOUTH);
 		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.Y_AXIS));
 
+		/**
+		 * PANEL_8 : Connection buttons
+		 */
+
 		panel_8 = new JPanel();
 		panel_1.add(panel_8);
 
-		btnTestConnection = new JButton("Test Connection");
+		btnTestConnection = new JButton("Test Conn.");
 		panel_8.add(btnTestConnection);
 
-		btnClearOutput = new JButton("Clear output");
-		panel_8.add(btnClearOutput);
-
-		btnOpen = new JButton("Open");
+		btnOpen = new JButton("Open conn.");
 		panel_8.add(btnOpen);
 		btnOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				app.Open();
 			}
 		});
-		btnStop = new JButton("Stop");
+
+		btnStop = new JButton("Close conn.");
 		panel_8.add(btnStop);
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				app.Stop();
 			}
 		});
-		
-		btnClearOutput.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				app.clearOutput();
-			}
-		});
-		
-		
+
 		btnTestConnection.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				app.testConnection();
 			}
 		});
 
-		
 		/************************************
-		 * PANEL 9
-		 */
-		
+		 * PANEL 9 : Log out configurations
+		 **********************************/
+
 		panel_9 = new JPanel();
 
-		/*JButton btnTEST = new JButton("Test Path");
-		panel_9.add(btnTEST);
-		btnTEST.addActionListener(new ActionListener() {
+		btnClearOutput = new JButton("Clear output");
+		panel_9.add(btnClearOutput);
+		btnClearOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Working Directory = " + System.getProperty("user.dir"));
-				generateFileName();
+				app.clearOutput();
 			}
-		});*/
-		
+		});
+
 		panel_1.add(panel_9);
 
-		chckbxWriteToFile = new JCheckBox("Send to file");
-		chckbxWriteToFile.addItemListener(new ItemListener(){ 
-			  public void itemStateChanged(ItemEvent itemEvent){
-					boolean test=chckbxWriteToFile.isSelected();
-					if(test)
-						appendMessage("The bytes recived will be Sent to SerialaData_xx.dat File");
-					else
-						appendMessage("The bytes recived will NOT BE Sent to SerialaData_xx.dat File");
-			      
-			     }
-			  
-			 });
-		 
+		chckbxWriteToFile = new JCheckBox("Write recived bytes to  file");
+		chckbxWriteToFile.setSelected(true);
+		chckbxWriteToFile.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent itemEvent) {
+				boolean test = chckbxWriteToFile.isSelected();
+				if (test)
+					appendMessage("The bytes recived will be Sent to SerialaData_xx.dat File");
+				else
+					appendMessage("The bytes recived will NOT BE Sent to SerialaData_xx.dat File");
+
+			}
+
+		});
+
 		panel_9.add(chckbxWriteToFile);
-		
+
 		chckbxLogDebug = new JCheckBox("Loglevel=Debug");
-		chckbxLogDebug.addItemListener(new ItemListener(){ 
-			  public void itemStateChanged(ItemEvent itemEvent){
-					LEVEL_DEBUG=chckbxLogDebug.isSelected();
-					if(LEVEL_DEBUG)
-						appendMessage("The bytes recived will also been written to log file...");
-					else
-						appendMessage("The bytes recived will NOT BE written to log file...");
-			      
-			     }
-			  
-			 });
-		
-		
+		chckbxLogDebug.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent itemEvent) {
+				LEVEL_DEBUG = chckbxLogDebug.isSelected();
+				if (LEVEL_DEBUG)
+					appendMessage("The bytes recived will also been written to log file...");
+				else
+					appendMessage("The bytes recived will NOT BE written to log file...");
+
+			}
+
+		});
+
 		panel_9.add(chckbxLogDebug);
 
-		
-		/***
-		 * PANEL 2
+		/*********************************
+		 * PANEL 2 : BOTTONS COMMANDS to serial
 		 */
-		
+
 		panel_2 = new JPanel();
 		getContentPane().add(panel_2, BorderLayout.WEST);
 		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
 
+		// PANEL 3 Buttons
 		panel_3 = new JPanel();
 		panel_2.add(panel_3);
 		panel_3.setLayout(new GridLayout(3, 3, 0, 0));
@@ -385,6 +383,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_3.add(btnD);
 		btnD.addActionListener(this);
 
+		// PAnel4 Toggle buttons
+		// TODO : to fix loading icons in toogle buttons
 		panel_4 = new JPanel();
 		panel_2.add(panel_4);
 		panel_4.setLayout(new GridLayout(3, 2, 0, 0));
@@ -434,6 +434,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		tglbtnOnoff4.addActionListener(this);
 		panel_4.add(tglbtnOnoff4);
 
+		// PANEL 5 SLIDERS and Send string
 		panel_5 = new JPanel();
 		panel_2.add(panel_5);
 		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
@@ -455,6 +456,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		panel_5.add(slider_2);
 
+		// PANEL _7 : SEND STRING
 		panel_7 = new JPanel();
 		panel_5.add(panel_7);
 		panel_7.setLayout(new GridLayout(4, 1, 0, 0));
@@ -467,7 +469,9 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		textToSend = new JTextField();
 		panel_7.add(textToSend);
 		textToSend.setColumns(10);
-
+		/*******
+		 * PANEL 6 : Text Area Control and Serial arrive
+		 */
 		panel_6 = new JPanel();
 		getContentPane().add(panel_6, BorderLayout.CENTER);
 		panel_6.setLayout(new GridLayout(2, 1, 0, 0));
@@ -492,7 +496,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_6.add(scrollPane_1);
 		scrollPane_1.setAutoscrolls(true);
 
-		// PopUp menu to copy serial data to clipboard
+		/**
+		 * PopUp menu to copy serial data to clipboard
+		 */
+
 		mntmCopyAllToClipboard = new JMenuItem("Copy all");
 		mntmCopyAllToClipboard.addActionListener(this);
 		mntmCopyAllToClipboard.setActionCommand(COPY_ALL_TO_CLIPBOARD);
@@ -509,17 +516,18 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		init();
 
 	}
-	
-	
-	String today ;
+
+	/**
+	 * Initialize with default values, and system parameters
+	 */
 	private void init() {
 		WorkingDir = System.getProperty("user.dir");
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
-		today=dateFormat.format(date);
+		today = dateFormat.format(date);
 
 		initLogFile();
-		
+
 		initOutputFile();
 		comboBoxBaudrate.setSelectedItem(baud_rates[5]);
 		comboBoxPortname.setSelectedItem(port_names[3]);
@@ -527,12 +535,12 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		comboBoxParityBits.setSelectedItem(parity_options[PARITY_NONE]);
 		chckbxDTR.setSelected(true);
 		chckbxRTS.setSelected(true);
-		this.appendMessage("Author : antoiovi 2019 ");
-		log("init()","Initilized all.. ",logFile );
+		this.appendMessage("Author : Antonello Iovino antoiovi 2019 ");
+		log("init()", "Initilized all.. ", logFile);
 	}
 
-PrintWriter logFile;	
-	
+	PrintWriter logFile;
+
 	void initLogFile() {
 		String logFileName = "log_" + today + (System.currentTimeMillis() + ".txt");
 		try {
@@ -540,21 +548,22 @@ PrintWriter logFile;
 		} catch (FileNotFoundException e) {
 			this.appendMessage("Unable to create log file....");
 		}
-	}	
+	}
 
-	
 	void initOutputFile() {
-		String fileName =this.generateFileName();
+		String fileName = this.generateFileName();
 		try {
 			outFile = new PrintWriter(fileName);
-			log("initOutputFile","outPut file"+fileName+"  Created",logFile);
+			log("initOutputFile", "outPut file" + fileName + "  Created", logFile);
 		} catch (FileNotFoundException e) {
 			this.appendMessage("Unable to create outPut file....");
-			log("initOutputFile","Unable to create outPut file....",logFile);
+			log("initOutputFile", "Unable to create outPut file....", logFile);
 		}
-	}	
-	
-	
+	}
+
+	/**
+	 * Open and close the selected port , only to verify connectivity
+	 */
 	private void testConnection() {
 		boolean test = false;
 
@@ -562,11 +571,9 @@ PrintWriter logFile;
 			try {
 				if (serial.portIsOpened()) {
 					test = true;
+					// The port is already opened: the test is finished
 					app.appendMessage("Serial Port already opened :" + portname);
-				}else {
-					
 				}
-
 			} catch (Exception e) {
 				test = false;
 				log("testConnection", "ERROR: Error checking if serial.portIsOpened() ", logFile);
@@ -574,29 +581,32 @@ PrintWriter logFile;
 			}
 		} else {
 			app.appendMessage("serial=null");
-			app.appendMessage("inticonnection to open serial port for test...");
-			initConnection();
-			if (serial.portIsOpened()) {
-				app.appendMessage("Port opened successfully!!");
-				app.appendMessage("Closing the serial port..!!");
-				try {
-					serial.close();
-					app.appendMessage("Port CLOSED successfully!!");
-					log("testConnection","Port CLOSED successfully!!", logFile);
-				} catch (IOException e) {
-					app.appendMessage("Error closing the port!!");	
-					log("testConnection", "ERROR: Error cclosing the port ", logFile);
-	
+			app.appendMessage("init connection to open serial port for testing...");
+			try {
+				initConnection();
+				if (serial.portIsOpened()) {
+					app.appendMessage("Port opened successfully!!:" + portname);
+					app.appendMessage("Closing the serial port..!! :" + portname);
 				}
-
-			} else {
-				app.appendMessage("Failed to initConnection() ...");
+			} catch (NullPointerException e) {
+				app.appendMessage("ERROR: Null Pointer eXception  opening port : " + portname);
+				log("testConnection", "ERROR: Null Pointer eXception opening port ", logFile);
+			}
+			try {
+				serial.close();
+				app.appendMessage("Port CLOSED successfully!!  :" + portname);
+				log("testConnection", "Port CLOSED successfully!!", logFile);
+			} catch (IOException e) {
+				app.appendMessage("Error closing the port!! : " + portname);
+				log("testConnection", "ERROR: Error cclosing the port ", logFile);
+			} catch (NullPointerException e) {
+				app.appendMessage("ERROR: Null Pointer eXception closing port  : " + portname);
+				log("testConnection", "ERROR: Null Pointer eXception  closing port", logFile);
 			}
 		}
+
 	}
 
-	
-	
 	/**
 	 * Open serial port
 	 */
@@ -609,35 +619,48 @@ PrintWriter logFile;
 					app.appendMessage("Serial Port already opened :" + portname);
 				else
 					serial.open();
-					} catch (SerialException e) {
-						e.printStackTrace();
-					}catch(NullPointerException e) {
-						app.appendMessage("Null pointer , tyng to reconnect ..." );
-						initConnection();
-						if (serial.portIsOpened()) {
-							app.appendMessage("Port opened successfully!!");
+			} catch (SerialException e) {
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+				app.appendMessage("Null pointer , tyng to reconnect ...:" + portname);
+				initConnection();
+				if (serial.portIsOpened()) {
+					app.appendMessage("Port opened successfully!!:" + portname);
 
-						} else {
-							app.appendMessage("Failed to initConnection() ...");
-						}
-						
-					}
-			
-		}else {
-			app.appendMessage("Serial not initialized ..!!");
-			initConnection();
-			if (serial.portIsOpened()) {
-				app.appendMessage("Port opened successfully!!");
+				} else {
+					app.appendMessage("Failed to initConnection() ...with port :" + portname);
+				}
 
-			} else {
-				app.appendMessage("Failed to initConnection() ...");
 			}
+
+		} else {
+
+			app.appendMessage("Serial not initialized ..!! Port :" + portname);
+
+			try {
+				initConnection();
+				if (serial.portIsOpened()) {
+					app.appendMessage("Port opened successfully!!:" + portname);
+					log("Open()", " Port opened successfully!!:" + portname, logFile);
+				} else {
+					app.appendMessage("Failed to initConnection() ...:" + portname);
+					log("Open()", "ERROR: Failed to initConnection() ...: ", logFile);
+				}
+			} catch (NullPointerException e) {
+				app.appendMessage("ERROR: Null Pointer eXception  opening port : " + portname);
+				log("Open()", "ERROR: Null Pointer eXception opening port ", logFile);
+			} catch (Exception e) {
+				app.appendMessage("ERROR: Could not open port: " + portname);
+				log("Open()", "ERROR: Could not open port .", logFile);
+			}
+
 		}
-	
-	
+
 	}
-	
-	
+
+	/***
+	 * Initialize the serial port
+	 */
 	private void initConnection() {
 		String name;
 		int baudrate;
@@ -649,6 +672,7 @@ PrintWriter logFile;
 
 		try {
 			name = (String) comboBoxPortname.getSelectedItem();
+			portname = name;
 			Pair p = (Pair) comboBoxBaudrate.getSelectedItem();
 			baudrate = p.value.intValue();
 
@@ -668,28 +692,27 @@ PrintWriter logFile;
 
 			if (serial.portIsOpened()) {
 
-				portname = name;
-				app.appendMessage("Porta opened :");
+				app.appendMessage("Port opened :" + portname);
 				TimeUnit.SECONDS.sleep(1);
 			} else
-				app.appendMessage("Port is not opened!!");
-			
+				app.appendMessage("Port is not opened :" + portname);
+
 		} catch (SerialException e) {
-			app.appendMessage("Serial Exception :");
+			app.appendMessage("Serial Exception opening port " + portname);
 			app.appendMessage(e.getMessage());
 			// e.printStackTrace();
 		} catch (IOException e) {
-			app.appendMessage("IO Exception :");
+			app.appendMessage("IO Exception opening port " + portname);
 			app.appendMessage(e.getMessage());
 			// e.printStackTrace();
 		} catch (InterruptedException e) {
 			// Timeunit.Seconds.sleep(..) exception
-			app.appendMessage("InterruptedException :");
+			app.appendMessage("InterruptedException opening port " + portname);
 			app.appendMessage(e.getMessage());
 			// e.printStackTrace();
 		}
 	}
-	
+
 	String fileName = "";
 
 	void openFileToWrite() {
@@ -703,13 +726,11 @@ PrintWriter logFile;
 
 	}
 
-
 	String generateFileName() {
 		final String fileprefix = "SerialData_";
 		int x = 1;
-		String Dir =WorkingDir;
+		String Dir = WorkingDir;
 
-		
 		File dir = new File(Dir);
 		File[] matchingFiles = dir.listFiles(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
@@ -718,42 +739,45 @@ PrintWriter logFile;
 		});
 		String suffix;
 		while (true) {
-			boolean contains=false;
+			boolean contains = false;
 			suffix = "_" + today + "-" + String.valueOf(x) + ".dat";
 
 			for (int ir = 0; ir < matchingFiles.length; ir++) {
-			//	appendMessage(matchingFiles[ir].toString());
+				// appendMessage(matchingFiles[ir].toString());
 				String s = matchingFiles[ir].toString();
-				
+
 				if (s.contains(suffix)) {
-					//appendMessage("\t FILE PRESENTE");
+					// appendMessage("\t FILE PRESENTE");
 					x++;
-					contains=true;
+					contains = true;
 					break;
 				}
 				suffix = "_" + today + "-" + String.valueOf(x) + ".dat";
 			}
-			if(contains)	continue;
+			if (contains)
+				continue;
 			suffix = "_" + today + "-" + String.valueOf(x) + ".dat";
 			break;
 		}
-		//appendMessage(fileprefix + suffix);
+		// appendMessage(fileprefix + suffix);
 		return fileprefix + suffix;
 	}
 
-	
-	
 	/**
 	 * Close serial port and output file
 	 */
 	void Stop() {
-		closeFile();
+		// closeFile();
 		try {
 			serial.dispose();
 		} catch (IOException e) {
 			appendMessage("Cant't close serial ! Maybe it's not opened.");
 			// e.printStackTrace();
+		} catch (NullPointerException e) {
+			app.appendMessage("ERROR: Null Pointer eXception :Closing port not opened.  ");
+			log("Stop()", "ERROR: Null Pointer eXception, Closing port not opened. ", logFile);
 		}
+
 	}
 
 	void closeFile() {
@@ -780,61 +804,43 @@ PrintWriter logFile;
 			serial.write(str);
 			// Add new line to string
 			serial.write('\n');
-			appendMessage("Sent to serial :"+str);
-			log("writeToSErial",str,logFile );
+			appendMessage("Sent to serial port " + portname + " : " + str);
+			log("writeToSErial", str, logFile);
 
 		} catch (Exception e) {
-			appendMessage("Error writing to serial poort.");
-			log("writeToSErial","Errore scrivendo sulla porta",logFile );
+			appendMessage("Error writing to serial port.");
+			log("writeToSErial", "Errore scrivendo sulla porta", logFile);
 		}
 	}
 
 	/**
-	 * Parametro ricevuto da lettura porta
-	 * 
-	 * setMessage()-->readFromSeraial()-->printLineRecived(msg);
-	 *                                \_->appendLineRecivedToFile(msg);
+	 * Parametro ricevuto da lettura porta Impelementation of Interface
+	 * com.antoiovi.LineRecived
 	 * 
 	 * @param line
 	 */
 	synchronized public void setMessage(String line) {
-		readFromSerial(line);
-	}
 
-	/*
-	 * setMessage()-->readFromSeraial()-->printLineRecived(msg);
-	 *                                 \_->appendLineRecivedToFile(msg);
-	 */
-	synchronized void readFromSerial(String msg) {
-		printLineRecived(msg);
-		if (chckbxWriteToFile.isSelected())
-			appendLineRecivedToFile(msg);
-		logDebug("readFromSerial",msg,logFile);
-	}
-
-	/**
-	 * setMessage()-->readFromSeraial()-->printLineRecived(msg);
-	 * \_->appendLineRecivedToFile(msg);
-	 */
-	void printLineRecived(String str) {
-		textAreaSerial.append(str);
-		// textAreaSerial.append("\n");
-		// Added to force Autoscroll of JPanel
+		textAreaSerial.append(line);
 		textAreaSerial.selectAll();
+		appendMessage("Line recived from port :" + portname);
+
+		if (chckbxWriteToFile.isSelected())
+			if (outFile != null) {
+				outFile.print(line);
+				outFile.flush();
+			}
+
+		logDebug("readFromSerial", line, logFile);
 
 	}
 
 	/**
+	 * Utility class
+	 * 
+	 * @author antoiovi
 	 *
-	 * Append String line to text file if out file exists and is opened
-	 * setMessage()-->readFromSeraial()-->printLineRecived(msg);
-	 * 								    \_->appendLineRecivedToFile(msg);
 	 */
-	void appendLineRecivedToFile(String str) {
-		if (outFile != null)
-			outFile.println(str);
-	}
-
 	private class Pair {
 		String name;
 		Integer value;
@@ -859,15 +865,18 @@ PrintWriter logFile;
 		String msg = e.getActionCommand();
 		if (msg.equals("Switch_1") || msg.equals("Switch_2") || msg.equals("Switch_3") || msg.equals("Switch_4")) {
 			AbstractButton abstractButton = (AbstractButton) e.getSource();
+			if (msg.indexOf('\n') > -1)
+				appendMessage("New line present in Switxh_kjhk");
 			if (abstractButton.getModel().isSelected())
 				msg = msg + "-ON";
 			else
 				msg = msg + "-OFF";
-			
+
+			appendMessage(msg);
 			writeToSerial(msg);
 		} else if (msg.equals(btnA.getActionCommand()) || msg.equals(btnB.getActionCommand())
 				|| msg.equals(btnC.getActionCommand()) || msg.equals(btnD.getActionCommand())) {
-			
+
 			writeToSerial(msg);
 
 		} else if (msg.equals(COPY_ALL_TO_CLIPBOARD)) {
@@ -884,41 +893,49 @@ PrintWriter logFile;
 			clipboard.setContents(stringSelection, null);
 		} else if (msg.equals(SEND_STRING_TO_SERIAL)) {
 
-			
 			writeToSerial(textToSend.getText());
 		}
 	}
 
+	/**
+	 * Log to system console
+	 * 
+	 * @param msg
+	 */
 	void log(String msg) {
 		// System.out.println(msg);
 	}
 
-	
-	
-	void log(String methodname,String msg,PrintWriter logfile) {
+	/**
+	 * Log To file
+	 * 
+	 * @param methodname
+	 * @param msg
+	 * @param logfile
+	 */
+	void log(String methodname, String msg, PrintWriter logfile) {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
-		String day=dateFormat.format(date);
-		if(logfile!=null) {
-			logfile.write(String.format("[%s][%s] %s \n",day,methodname,msg));
+		String day = dateFormat.format(date);
+		if (logfile != null) {
+			logfile.write(String.format("[%s][%s] %s \n", day, methodname, msg));
 		}
 
 	}
-	
-	boolean LEVEL_DEBUG=false;
-	
-	void logDebug(String methodname,String msg,PrintWriter logfile) {
-		if(!LEVEL_DEBUG)
+
+	boolean LEVEL_DEBUG = false;
+
+	void logDebug(String methodname, String msg, PrintWriter logfile) {
+		if (!LEVEL_DEBUG)
 			return;
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
-		String day=dateFormat.format(date);
-		if(logfile!=null) {
-			logfile.write(String.format("[%s][%s] %s \n",day,methodname,msg));
+		String day = dateFormat.format(date);
+		if (logfile != null) {
+			logfile.write(String.format("[%s][%s] %s \n", day, methodname, msg));
 		}
 	}
-	
-	
+
 	/*
 	 * ChangeListener : for Sliders
 	 */
