@@ -42,6 +42,8 @@ import javax.swing.JScrollPane;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
@@ -327,21 +329,41 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_1.add(panel_9);
 
 		chckbxWriteToFile = new JCheckBox("Send to file");
+		chckbxWriteToFile.addItemListener(new ItemListener(){ 
+			  public void itemStateChanged(ItemEvent itemEvent){
+					boolean test=chckbxWriteToFile.isSelected();
+					if(test)
+						appendMessage("The bytes recived will be Sent to SerialaData_xx.dat File");
+					else
+						appendMessage("The bytes recived will NOT BE Sent to SerialaData_xx.dat File");
+			      
+			     }
+			  
+			 });
+		 
 		panel_9.add(chckbxWriteToFile);
+		
 		chckbxLogDebug = new JCheckBox("Loglevel=Debug");
-		chckbxLogDebug.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				LEVEL_DEBUG=chckbxLogDebug.isSelected();
-				if(LEVEL_DEBUG)
-					appendMessage("The bytes recived will also been written to log file...");
-			}
-		});
+		chckbxLogDebug.addItemListener(new ItemListener(){ 
+			  public void itemStateChanged(ItemEvent itemEvent){
+					LEVEL_DEBUG=chckbxLogDebug.isSelected();
+					if(LEVEL_DEBUG)
+						appendMessage("The bytes recived will also been written to log file...");
+					else
+						appendMessage("The bytes recived will NOT BE written to log file...");
+			      
+			     }
+			  
+			 });
+		
 		
 		panel_9.add(chckbxLogDebug);
 
-		label = new JLabel("New label");
-		panel_9.add(label);
-
+		
+		/***
+		 * PANEL 2
+		 */
+		
 		panel_2 = new JPanel();
 		getContentPane().add(panel_2, BorderLayout.WEST);
 		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
