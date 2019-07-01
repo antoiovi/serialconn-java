@@ -1,3 +1,7 @@
+# Added for Talk.jar Antonello IOvino
+log_*.txt
+SerailData_*.dat
+
 # Compiled class file
 *.class
 

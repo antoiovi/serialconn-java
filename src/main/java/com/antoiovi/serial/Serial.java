@@ -125,18 +125,20 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double sto
 	                                  irate, parityNone, idatabits, stopbit));
 	      }
 	      port.addEventListener(this);
-	    } catch (SerialPortException e) {
-	      if (e.getPortName().startsWith("/dev") && SerialPortException.TYPE_PERMISSION_DENIED.equals(e.getExceptionType())) {
-	        throw new SerialException(format(tr("Error opening serial port ''{0}''. Try consulting the documentation at http://playground.arduino.cc/Linux/All#Permission"), iname));
-	      }
-	      throw new SerialException(format(tr("Error opening serial port ''{0}''."), iname), e);
-	    }
-    if (port == null) {
-      throw new SerialNotFoundException(format(tr("Serial port ''{0}'' not found. Did you select the right one from the Tools > Serial Port menu?"), iname));
-    }
-  
-	    if (port == null) {
-	      throw new SerialNotFoundException(format(tr("Serial port ''{0}'' not found. Did you select the right one from the Tools > Serial Port menu?"), iname));
+		} catch (SerialPortException e) {
+			if (e.getPortName().startsWith("/dev") && SerialPortException.TYPE_PERMISSION_DENIED.equals(e.getExceptionType())) {
+				throw new SerialException("Error opening serial port : Permissione denied !!");
+			}
+			throw new SerialException(format(tr("Error opening serial port ''{0}''."), iname), e);
+		}
+		if (port == null) {
+			throw new SerialNotFoundException(format(tr(
+					"Serial port ''{0}'' not found. Did you select the right one from the Tools > Serial Port menu?"),
+					iname));
+		}
+
+		if (port == null) {
+			throw new SerialNotFoundException(format(tr("Serial port ''{0}'' not found. Did you select the right one from the Tools > Serial Port menu?"), iname));
 	    }
 	  
   }
@@ -159,6 +161,36 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double sto
       }
     }
   }
+  
+  public void close() throws IOException {
+	    if (port != null) {
+	      try {
+	        if (port.isOpened()) {
+	          port.closePort();  // close the port
+	        }
+	      } catch (SerialPortException e) {
+	        throw new IOException(e);
+	      } 
+	    }
+	  }
+	  
+  
+  
+  
+  
+	public void open() throws SerialException {
+		try {
+			port.openPort();
+		} catch (SerialPortException e) {
+			if (e.getPortName().startsWith("/dev")
+					&& SerialPortException.TYPE_PERMISSION_DENIED.equals(e.getExceptionType())) {
+				throw new SerialException("Error opening serial port : Permissione denied !!");
+			}
+			throw new SerialException("Error opening serial port !!");
+		}catch(NullPointerException e) {
+			throw new NullPointerException("ERROR: port must not be null!");			
+		}
+	}
 
  // @Override
    /**
@@ -210,8 +242,14 @@ public Serial(String iname, int irate, int parityNone, int idatabits, double sto
 
 
 
-public boolean portIsOpened(){
-  return port.isOpened();
+public boolean portIsOpened() throws NullPointerException{
+	
+	boolean		test=port.isOpened();
+	
+	if(!test)throw new NullPointerException("ERROR: port must not be null!");	
+	
+	return test;
+	
 }
   /**
    * This will handle both ints, bytes and chars transparently.
