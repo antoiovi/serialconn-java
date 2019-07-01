@@ -189,6 +189,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	private JButton btnOpen;
 
+	private JCheckBox chckbxLogDebug;
+
 
 	/**
 	 * Launch the application.
@@ -306,20 +308,36 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			}
 		});
 
+		
+		/************************************
+		 * PANEL 9
+		 */
+		
 		panel_9 = new JPanel();
 
-		JButton btnTEST = new JButton("Test Path");
+		/*JButton btnTEST = new JButton("Test Path");
 		panel_9.add(btnTEST);
 		btnTEST.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("Working Directory = " + System.getProperty("user.dir"));
 				generateFileName();
 			}
-		});
+		});*/
+		
 		panel_1.add(panel_9);
 
 		chckbxWriteToFile = new JCheckBox("Send to file");
 		panel_9.add(chckbxWriteToFile);
+		chckbxLogDebug = new JCheckBox("Loglevel=Debug");
+		chckbxLogDebug.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				LEVEL_DEBUG=chckbxLogDebug.isSelected();
+				if(LEVEL_DEBUG)
+					appendMessage("The bytes recived will also been written to log file...");
+			}
+		});
+		
+		panel_9.add(chckbxLogDebug);
 
 		label = new JLabel("New label");
 		panel_9.add(label);
