@@ -44,6 +44,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -542,11 +543,15 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	PrintWriter logFile;
 
 	void initLogFile() {
-		String logFileName = "log_" + today + (System.currentTimeMillis() + ".txt");
+		//String logFileName = "log_" + today + (System.currentTimeMillis() + ".txt");
+		String logFileName = "log_" + today + ".txt" ;
 		try {
-			logFile = new PrintWriter(logFileName);
+			logFile = new PrintWriter(new FileWriter(logFileName,true));
 		} catch (FileNotFoundException e) {
-			this.appendMessage("Unable to create log file....");
+			this.appendMessage("File nOt Found:Unable to create log file....");
+		} catch (IOException e) {
+			this.appendMessage("IOException : Unable to create log file....");
+			
 		}
 	}
 
