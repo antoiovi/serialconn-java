@@ -293,7 +293,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_8.add(btnOpen);
 		btnOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				app.Open();
+				app.openConnection();
 			}
 		});
 
@@ -301,7 +301,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_8.add(btnStop);
 		btnStop.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				app.Stop();
+				app.closeConnection();
 			}
 		});
 
@@ -529,7 +529,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		initLogFile();
 
-		initOutputFile();
 		comboBoxBaudrate.setSelectedItem(baud_rates[5]);
 		comboBoxPortname.setSelectedItem(port_names[3]);
 		comboBoxDataBits.setSelectedItem(SerialPort.DATABITS_8);
@@ -555,13 +554,18 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		}
 	}
 
+	/**
+	 * GENERATE NEW NAME OF DATA OUTPUT FILE AND OPEN IT 
+	 */
 	void initOutputFile() {
 		String fileName = this.generateFileName();
 		try {
 			outFile = new PrintWriter(fileName);
-			log("initOutputFile", "outPut file" + fileName + "  Created", logFile);
+			app.fileName=fileName;
+			app.appendMessage("OutPut file : " + fileName + "  Created !!");
+			log("initOutputFile", "outPut file : " + fileName + "  Created!! ", logFile);
 		} catch (FileNotFoundException e) {
-			this.appendMessage("Unable to create outPut file....");
+			app.appendMessage("Unable to create outPut file....");
 			log("initOutputFile", "Unable to create outPut file....", logFile);
 		}
 	}
@@ -615,36 +619,46 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	/**
 	 * Open serial port
 	 */
-	private void Open() {
+	private void openConnection() {
 		boolean test = false;
-
+		String methodname="openConnection";
+		
 		if (serial != null) {
 			try {
 				if (serial.portIsOpened())
 					app.appendMessage("Serial Port already opened :" + portname);
-				else
+				else {
 					serial.open();
+					initOutputFile();
+					}
 			} catch (SerialException e) {
-				e.printStackTrace();
+				app.appendMessage("SerialException opening  :" + portname);
+				app.appendMessage("SerialException  :" + e.toString());
+				log(methodname,"ERROR :"+"SerialException opening  :" + portname, logFile);
+				log(methodname,"ERROR :"+"SerialException opening  :" + e.toString(), logFile);
 			} catch (NullPointerException e) {
-				app.appendMessage("Null pointer , tyng to reconnect ...:" + portname);
+				app.appendMessage("ERROR :"+"Null pointer , trying to reconnect ...:" + portname);
 				initConnection();
 				if (serial.portIsOpened()) {
 					app.appendMessage("Port opened successfully!!:" + portname);
-
+					initOutputFile();
+					log(methodname,"Port opened successfully!!:" + portname, logFile);
 				} else {
 					app.appendMessage("Failed to initConnection() ...with port :" + portname);
+					log(methodname,"ERROR :"+"Failed to initConnection() ...with port :" + portname, logFile);
 				}
 
 			}
 
-		} else {
+		} else// if (serial==null) We must call initConnection() : 
+		{
 
 			app.appendMessage("Serial not initialized ..!! Port :" + portname);
 
 			try {
 				initConnection();
 				if (serial.portIsOpened()) {
+					initOutputFile();
 					app.appendMessage("Port opened successfully!!:" + portname);
 					log("Open()", " Port opened successfully!!:" + portname, logFile);
 				} else {
@@ -723,10 +737,12 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	void openFileToWrite() {
 		try {
 			outFile = new PrintWriter(fileName);
+			log("openFileToWrite()"," File opened successfully:" + fileName, logFile);
 		} catch (FileNotFoundException e) {
 			outFile = null;
 			textAreaControl.append(e.toString());
 			textAreaControl.append("Error..... Can't open output file !!!");
+			log("openFileToWrite()","ERROR :"+"FileNotFoundException - Can't open output file :" + fileName, logFile);
 		}
 
 	}
@@ -771,13 +787,18 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	/**
 	 * Close serial port and output file
 	 */
-	void Stop() {
+	void closeConnection() {
 		// closeFile();
 		try {
-			serial.dispose();
+			
+			if (serial != null) {
+				serial.dispose();
+				appendMessage("Port closed :"+portname);
+				closeOutputFile();
+			}
 		} catch (IOException e) {
-			appendMessage("Cant't close serial ! Maybe it's not opened.");
-			// e.printStackTrace();
+			app.appendMessage("Cant't close serial ! Maybe it's not opened.");
+			log("Stop()", "ERROR: IOException .  Cant't close serial ! Maybe it's not opened.", logFile);
 		} catch (NullPointerException e) {
 			app.appendMessage("ERROR: Null Pointer eXception :Closing port not opened.  ");
 			log("Stop()", "ERROR: Null Pointer eXception, Closing port not opened. ", logFile);
@@ -785,7 +806,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	}
 
-	void closeFile() {
+	void closeOutputFile() {
 		if (outFile != null) {
 			outFile.close();
 			appendMessage("Closed file " + fileName);
