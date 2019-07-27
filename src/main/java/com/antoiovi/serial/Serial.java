@@ -73,6 +73,14 @@ public class Serial implements SerialPortEventListener {
 	  init(iname, baudRate, parity,  databits,  stopbit,  RTS, DTR);
   }
 
+  /**
+   *   Inizzializza con parametri di default tranne Nome Porta
+   * @param iname
+   * @throws SerialException
+   */
+    public Serial(String iname,int brate) throws SerialException {
+  	  init(iname, brate, parity,  databits,  stopbit,  RTS, DTR);
+    }
 /**
  * 
  * @param iname

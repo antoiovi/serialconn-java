@@ -30,8 +30,31 @@
 	</dependencies>
 	<build>
 		<plugins>
-			
-
+			<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>3.1</version>
+    <configuration>
+        <source>1.7</source>
+        <target>1.7</target>
+    </configuration>
+</plugin>
+	<!-- maven-jar-plugin : per impostare la classe main -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>
+								com.antoiovi.App
+							</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 			<!-- maven dependency plugin : per scaricare le dependencies in cartella 
 				locale -->
 
@@ -66,54 +89,7 @@
 
 		</plugins>
 	</build>
-	<profiles>
-    <profile>
-      <id>talk</id>
-      <build>
-	<plugins>
-			<!-- maven-jar-plugin : per impostare la classe main -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>
-								com.antoiovi.serialtalk.Talk
-							</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-	</plugins>
-	</build>
-    </profile>
-<profile>
-      <id>readserial</id>
-      <build>
-	<plugins>
-			<!-- maven-jar-plugin : per impostare la classe main -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>
-								com.antoiovi.App
-							</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-	</plugins>
-	</build>
-    </profile>
-  </profiles>
+	
 	
 	
 </project>
