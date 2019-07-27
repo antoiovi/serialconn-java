@@ -102,8 +102,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			new Pair(String.valueOf(SerialPort.BAUDRATE_128000), SerialPort.BAUDRATE_128000),
 			new Pair(String.valueOf(SerialPort.BAUDRATE_256000), SerialPort.BAUDRATE_256000) };
 
-	String[] port_names = { "/dev/ttyS0", "/dev/ttyS1", "/dev/ttyS2", "/dev/tty0", "/dev/tty1", "/dev/tty2",
-			"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2" };
+	String[] port_names = {"/dev/ttyACM0","/dev/ttyACM1","/dev/ttyACM3",
+							"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2",
+							"/dev/ttyS0", "/dev/ttyS1", "/dev/ttyS2", 
+							"/dev/tty0", "/dev/tty1", "/dev/tty2" };
 
 	Integer[] data_bits = { SerialPort.DATABITS_5, SerialPort.DATABITS_6, SerialPort.DATABITS_7,
 			SerialPort.DATABITS_8 };
@@ -245,6 +247,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		JLabel lblPortName = new JLabel("Port Name");
 		comboBoxPortname = new JComboBox(new DefaultComboBoxModel(port_names));
 		panel.add(comboBoxPortname);
+		
 		JLabel lblNewLabel = new JLabel("Baud Rate");
 		comboBoxBaudrate = new JComboBox(new DefaultComboBoxModel(baud_rates));
 		panel.add(comboBoxBaudrate);
