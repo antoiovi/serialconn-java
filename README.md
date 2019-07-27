@@ -8,7 +8,8 @@ La mia pagina di riferimento dove viene spiagto il codice :
  
 Branch serialtalk :
     
- ° L'applicazione di prova App.java, senza interfaccia grafica 
+ ° L'applicazione di prova App.java, senza interfaccia grafica (Per applicazione con interfaccia grafica
+ 		switch al branch master)
  
  ° La classe Serial.java utilizza la libreria jssc per connettersi ad una porta seriale e ricevere ed inviare dati ad essa;
  
