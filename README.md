@@ -38,7 +38,7 @@ La mia pagina di riferimento dove viene spiagto il codice :
  Esecuzione :
 		
 		
-		serialconn-java$ java -jar target/Talk.jar 	
+		serialconn-java$ java -jar Talk.jar 	
 
 Per esporatre il programma una vlota compilato come sopra, copiare in una directory il file Talk.jar e la directory con il file di libreria: lib/jscc-2.8.0.jar
 
