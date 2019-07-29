@@ -25,6 +25,7 @@ SOFTWARE.
 package com.antoiovi.serialtalk;
 
 import jssc.SerialPort;
+import jssc.SerialPortList;
 
 import java.awt.EventQueue;
 
@@ -58,6 +59,7 @@ import javax.swing.JToggleButton;
 import java.awt.GridLayout;
 
 import javax.swing.JSlider;
+
 
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
@@ -195,6 +197,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	String today;
 
+	private JButton btnCheckPorts;
+
 	/**
 	 * Launch the application.
 	 */
@@ -243,6 +247,14 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		 */
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.NORTH);
+		
+		btnCheckPorts = new JButton("Check ports");
+		panel.add(btnCheckPorts);
+		btnCheckPorts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				app.checkPorts();
+			}
+		});
 
 		JLabel lblPortName = new JLabel("Port Name");
 		comboBoxPortname = new JComboBox(new DefaultComboBoxModel(port_names));
@@ -520,6 +532,21 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		init();
 
 	}
+	
+	private void checkPorts() {
+		int x=0;
+		DefaultComboBoxModel model= new DefaultComboBoxModel(port_names);
+		for (String s : this.getPortNames()) {
+			x++;
+			String msg=String.format("%d) Port %s detected", x,s);
+			this.appendMessage(msg);
+			model.addElement(s);
+			this.log("checkPorts", msg, logFile);
+		}
+		comboBoxPortname.setModel(model);
+		if(x==0)
+			appendMessage("No port detected ");
+	}
 
 	/**
 	 * Initialize with default values, and system parameters
@@ -540,8 +567,16 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		chckbxRTS.setSelected(true);
 		this.appendMessage("Author : Antonello Iovino antoiovi 2019 ");
 		log("init()", "Initilized all.. ", logFile);
+
+ 
 	}
 
+	private String[] getPortNames() {
+		return SerialPortList.getPortNames();
+	}
+	
+	
+	
 	PrintWriter logFile;
 
 	void initLogFile() {
