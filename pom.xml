@@ -5,7 +5,7 @@
 
 	<groupId>com.antoiovi</groupId>
 	<artifactId>serial</artifactId>
-	<version>1</version>
+	<version>1.2</version>
 	<packaging>jar</packaging>
 
 	<name>serial</name>
@@ -62,7 +62,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
 						<configuration>
-							<finalName>Talk</finalName>
+							<finalName>Talk-1.2</finalName>
 							<archive>
 								<manifest>
 									<addClasspath>true</addClasspath>

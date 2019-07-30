@@ -25,6 +25,7 @@ SOFTWARE.
 package com.antoiovi.serialtalk;
 
 import jssc.SerialPort;
+import jssc.SerialPortList;
 
 import java.awt.EventQueue;
 
@@ -56,8 +57,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import java.awt.GridLayout;
+import java.awt.ItemSelectable;
 
 import javax.swing.JSlider;
+
 
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
@@ -195,6 +198,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	String today;
 
+	private JButton btnCheckPorts;
+
+	private JCheckBox chckbxAdvanceConfig;
+
 	/**
 	 * Launch the application.
 	 */
@@ -243,6 +250,14 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		 */
 		JPanel panel = new JPanel();
 		getContentPane().add(panel, BorderLayout.NORTH);
+		
+		btnCheckPorts = new JButton("Check ports");
+		panel.add(btnCheckPorts);
+		btnCheckPorts.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				app.checkPorts();
+			}
+		});
 
 		JLabel lblPortName = new JLabel("Port Name");
 		comboBoxPortname = new JComboBox(new DefaultComboBoxModel(port_names));
@@ -251,27 +266,51 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		JLabel lblNewLabel = new JLabel("Baud Rate");
 		comboBoxBaudrate = new JComboBox(new DefaultComboBoxModel(baud_rates));
 		panel.add(comboBoxBaudrate);
+		
+		chckbxAdvanceConfig=new JCheckBox("Advanced config.");
+		chckbxAdvanceConfig.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent itemEvent) {
+				boolean test = chckbxAdvanceConfig.isSelected();
+				comboBoxDataBits.setEnabled(test);
+				comboBoxParityBits.setEnabled(test);
+				comboBoxStopBits.setEnabled(test);
+				chckbxDTR.setEnabled(test);
+				chckbxRTS.setEnabled(test);
+				if (test) 
+					appendMessage("Advanced options DataBits ,Parity bit, stop bit,DTR,RTS, ENABLED");
+				else 
+					appendMessage("Advanced options DataBits ,Parity bit, stop bit,DTR,RTS, DISABLED");
+				
+			}
 
+		});
+		panel.add(chckbxAdvanceConfig);
+		
 		JLabel lblParity = new JLabel("Parity");
 		panel.add(lblParity);
 
 		comboBoxParityBits = new JComboBox(new DefaultComboBoxModel(parity_options));
+		comboBoxParityBits.setEnabled(false);
 		panel.add(comboBoxParityBits);
 
 		JLabel lblDataBits = new JLabel("Data bits");
 		panel.add(lblDataBits);
 		comboBoxDataBits = new JComboBox(new DefaultComboBoxModel(data_bits));
+		comboBoxDataBits.setEnabled(false);
 		panel.add(comboBoxDataBits);
 
 		JLabel lblStopBits = new JLabel("Stop bits");
 		panel.add(lblStopBits);
 		comboBoxStopBits = new JComboBox(new DefaultComboBoxModel(stop_bits));
+		comboBoxStopBits.setEnabled(false);
 		panel.add(comboBoxStopBits);
 
 		chckbxRTS = new JCheckBox("RTS");
+		chckbxRTS.setEnabled(false);
 		panel.add(chckbxRTS);
 
 		chckbxDTR = new JCheckBox("DTR");
+		chckbxDTR.setEnabled(false);
 		panel.add(chckbxDTR);
 
 		/**
@@ -520,6 +559,21 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		init();
 
 	}
+	
+	private void checkPorts() {
+		int x=0;
+		DefaultComboBoxModel model= new DefaultComboBoxModel(port_names);
+		for (String s : this.getPortNames()) {
+			x++;
+			String msg=String.format("%d) Port %s detected", x,s);
+			this.appendMessage(msg);
+			model.addElement(s);
+			this.log("checkPorts", msg, logFile);
+		}
+		comboBoxPortname.setModel(model);
+		if(x==0)
+			appendMessage("No port detected ");
+	}
 
 	/**
 	 * Initialize with default values, and system parameters
@@ -540,9 +594,18 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		chckbxRTS.setSelected(true);
 		this.appendMessage("Author : Antonello Iovino antoiovi 2019 ");
 		log("init()", "Initilized all.. ", logFile);
+
+ 
 	}
 
+	private String[] getPortNames() {
+		return SerialPortList.getPortNames();
+	}
+	
+	
+	
 	PrintWriter logFile;
+
 
 	void initLogFile() {
 		//String logFileName = "log_" + today + (System.currentTimeMillis() + ".txt");
@@ -561,6 +624,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 * GENERATE NEW NAME OF DATA OUTPUT FILE AND OPEN IT 
 	 */
 	void initOutputFile() {
+		
 		String fileName = this.generateFileName();
 		try {
 			outFile = new PrintWriter(fileName);
@@ -572,57 +636,45 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			log("initOutputFile", "Unable to create outPut file....", logFile);
 		}
 	}
+	
+	
+	private boolean testingConnection;
+
+	public boolean isTestingConnection() {
+		return testingConnection;
+	}
+
+	public void setTestingConnection(boolean testingConnection) {
+		this.testingConnection = testingConnection;
+	}
 
 	/**
 	 * Open and close the selected port , only to verify connectivity
 	 */
 	private void testConnection() {
-		boolean test = false;
+		if(app.isConnectionOpend()) return;
+		app.setTestingConnection(true);
+		app.openConnection();
+		app.closeConnection();
+		app.setTestingConnection(false);
+	}
 
-		if (serial != null) {
-			try {
-				if (serial.portIsOpened()) {
-					test = true;
-					// The port is already opened: the test is finished
-					app.appendMessage("Serial Port already opened :" + portname);
-				}
-			} catch (Exception e) {
-				test = false;
-				log("testConnection", "ERROR: Error checking if serial.portIsOpened() ", logFile);
-				app.appendMessage("ERROR: Error checking if serial.portIsOpened() ");
-			}
-		} else {
-			app.appendMessage("serial=null");
-			app.appendMessage("init connection to open serial port for testing...");
-			try {
-				initConnection();
-				if (serial.portIsOpened()) {
-					app.appendMessage("Port opened successfully!!:" + portname);
-					app.appendMessage("Closing the serial port..!! :" + portname);
-				}
-			} catch (NullPointerException e) {
-				app.appendMessage("ERROR: Null Pointer eXception  opening port : " + portname);
-				log("testConnection", "ERROR: Null Pointer eXception opening port ", logFile);
-			}
-			try {
-				serial.close();
-				app.appendMessage("Port CLOSED successfully!!  :" + portname);
-				log("testConnection", "Port CLOSED successfully!!", logFile);
-			} catch (IOException e) {
-				app.appendMessage("Error closing the port!! : " + portname);
-				log("testConnection", "ERROR: Error cclosing the port ", logFile);
-			} catch (NullPointerException e) {
-				app.appendMessage("ERROR: Null Pointer eXception closing port  : " + portname);
-				log("testConnection", "ERROR: Null Pointer eXception  closing port", logFile);
-			}
-		}
+	boolean connectionOpend;
+	
+	public boolean isConnectionOpend() {
+		return connectionOpend;
+	}
 
+	public void setConnectionOpend(boolean connectionOpend) {
+		this.connectionOpend = connectionOpend;
+		btnTestConnection.setEnabled(!connectionOpend);
 	}
 
 	/**
 	 * Open serial port
 	 */
 	private void openConnection() {
+		
 		boolean test = false;
 		String methodname="openConnection";
 		
@@ -632,7 +684,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					app.appendMessage("Serial Port already opened :" + portname);
 				else {
 					serial.open();
+					if(app.isTestingConnection()) return;
 					initOutputFile();
+					app.setTitle(portname);
+					app.setConnectionOpend(true);
 					}
 			} catch (SerialException e) {
 				app.appendMessage("SerialException opening  :" + portname);
@@ -644,7 +699,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 				initConnection();
 				if (serial.portIsOpened()) {
 					app.appendMessage("Port opened successfully!!:" + portname);
+					if(app.isTestingConnection()) return;
+
 					initOutputFile();
+					app.setTitle(portname);
+					app.setConnectionOpend(true);
 					log(methodname,"Port opened successfully!!:" + portname, logFile);
 				} else {
 					app.appendMessage("Failed to initConnection() ...with port :" + portname);
@@ -661,8 +720,12 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			try {
 				initConnection();
 				if (serial.portIsOpened()) {
-					initOutputFile();
 					app.appendMessage("Port opened successfully!!:" + portname);
+					if(app.isTestingConnection()) return;
+					initOutputFile();
+					app.setTitle(portname);
+					app.setConnectionOpend(true);
+
 					log("Open()", " Port opened successfully!!:" + portname, logFile);
 				} else {
 					app.appendMessage("Failed to initConnection() ...:" + portname);
@@ -795,9 +858,16 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		try {
 			
 			if (serial != null) {
+				if(serial.portIsOpened()) {
 				serial.dispose();
 				appendMessage("Port closed :"+portname);
+				app.setTitle("");
+				app.setConnectionOpend(false);
 				closeOutputFile();
+				}else {
+					appendMessage("Port already closed ;");
+
+				}
 			}
 		} catch (IOException e) {
 			app.appendMessage("Cant't close serial ! Maybe it's not opened.");
@@ -810,6 +880,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	void closeOutputFile() {
+		if(testingConnection)
+			return;
 		if (outFile != null) {
 			outFile.close();
 			appendMessage("Closed file " + fileName);
