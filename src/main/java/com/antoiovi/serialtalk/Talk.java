@@ -57,6 +57,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import java.awt.GridLayout;
+import java.awt.ItemSelectable;
 
 import javax.swing.JSlider;
 
@@ -199,6 +200,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	private JButton btnCheckPorts;
 
+	private JCheckBox chckbxAdvanceConfig;
+
 	/**
 	 * Launch the application.
 	 */
@@ -263,27 +266,51 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		JLabel lblNewLabel = new JLabel("Baud Rate");
 		comboBoxBaudrate = new JComboBox(new DefaultComboBoxModel(baud_rates));
 		panel.add(comboBoxBaudrate);
+		
+		chckbxAdvanceConfig=new JCheckBox("Advanced config.");
+		chckbxAdvanceConfig.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent itemEvent) {
+				boolean test = chckbxAdvanceConfig.isSelected();
+				comboBoxDataBits.setEnabled(test);
+				comboBoxParityBits.setEnabled(test);
+				comboBoxStopBits.setEnabled(test);
+				chckbxDTR.setEnabled(test);
+				chckbxRTS.setEnabled(test);
+				if (test) 
+					appendMessage("Advanced options DataBits ,Parity bit, stop bit,DTR,RTS, ENABLED");
+				else 
+					appendMessage("Advanced options DataBits ,Parity bit, stop bit,DTR,RTS, DISABLED");
+				
+			}
 
+		});
+		panel.add(chckbxAdvanceConfig);
+		
 		JLabel lblParity = new JLabel("Parity");
 		panel.add(lblParity);
 
 		comboBoxParityBits = new JComboBox(new DefaultComboBoxModel(parity_options));
+		comboBoxParityBits.setEnabled(false);
 		panel.add(comboBoxParityBits);
 
 		JLabel lblDataBits = new JLabel("Data bits");
 		panel.add(lblDataBits);
 		comboBoxDataBits = new JComboBox(new DefaultComboBoxModel(data_bits));
+		comboBoxDataBits.setEnabled(false);
 		panel.add(comboBoxDataBits);
 
 		JLabel lblStopBits = new JLabel("Stop bits");
 		panel.add(lblStopBits);
 		comboBoxStopBits = new JComboBox(new DefaultComboBoxModel(stop_bits));
+		comboBoxStopBits.setEnabled(false);
 		panel.add(comboBoxStopBits);
 
 		chckbxRTS = new JCheckBox("RTS");
+		chckbxRTS.setEnabled(false);
 		panel.add(chckbxRTS);
 
 		chckbxDTR = new JCheckBox("DTR");
+		chckbxDTR.setEnabled(false);
 		panel.add(chckbxDTR);
 
 		/**
