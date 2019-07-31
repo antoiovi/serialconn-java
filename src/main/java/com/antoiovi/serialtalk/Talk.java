@@ -891,6 +891,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	void appendMessage(String str) {
 		textAreaControl.append(str);
 		textAreaControl.append("\n");
+		textAreaControl.selectAll();
 	}
 
 	void clearOutput() {
