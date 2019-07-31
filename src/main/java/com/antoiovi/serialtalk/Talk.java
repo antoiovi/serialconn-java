@@ -105,10 +105,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			new Pair(String.valueOf(SerialPort.BAUDRATE_128000), SerialPort.BAUDRATE_128000),
 			new Pair(String.valueOf(SerialPort.BAUDRATE_256000), SerialPort.BAUDRATE_256000) };
 
-	String[] port_names = {"/dev/ttyACM0","/dev/ttyACM1","/dev/ttyACM3",
-							"/dev/ttyUSB0", "/dev/ttyUSB1", "/dev/ttyUSB2",
-							"/dev/ttyS0", "/dev/ttyS1", "/dev/ttyS2", 
-							"/dev/tty0", "/dev/tty1", "/dev/tty2" };
+	String[] port_names ;
 
 	Integer[] data_bits = { SerialPort.DATABITS_5, SerialPort.DATABITS_6, SerialPort.DATABITS_7,
 			SerialPort.DATABITS_8 };
@@ -260,7 +257,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		});
 
 		JLabel lblPortName = new JLabel("Port Name");
-		comboBoxPortname = new JComboBox(new DefaultComboBoxModel(port_names));
+		comboBoxPortname = new JComboBox();
 		panel.add(comboBoxPortname);
 		
 		JLabel lblNewLabel = new JLabel("Baud Rate");
@@ -562,12 +559,13 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	
 	private void checkPorts() {
 		int x=0;
-		DefaultComboBoxModel model= new DefaultComboBoxModel(port_names);
-		for (String s : this.getPortNames()) {
+		port_names= this.getPortNames();
+		DefaultComboBoxModel<String> defaultComboBoxModel = new DefaultComboBoxModel<String>(port_names);
+		DefaultComboBoxModel<String> model= defaultComboBoxModel;
+		for (String s :port_names ) {
 			x++;
 			String msg=String.format("%d) Port %s detected", x,s);
 			this.appendMessage(msg);
-			model.addElement(s);
 			this.log("checkPorts", msg, logFile);
 		}
 		comboBoxPortname.setModel(model);
@@ -587,7 +585,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		initLogFile();
 
 		comboBoxBaudrate.setSelectedItem(baud_rates[5]);
-		comboBoxPortname.setSelectedItem(port_names[3]);
+		// Initialize ports and check box ports
+		checkPorts();
 		comboBoxDataBits.setSelectedItem(SerialPort.DATABITS_8);
 		comboBoxParityBits.setSelectedItem(parity_options[PARITY_NONE]);
 		chckbxDTR.setSelected(true);
