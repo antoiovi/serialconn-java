@@ -38,6 +38,7 @@ int readline(int readch, char *buffer, int len) {
 int ON=0;
 int OFF=1;
 int Switch_1=1;
+int Trimmer1=50;
 int X=0;
 void loop() {
 if (readline(Serial.read(), buf, 80) > 0) {

@@ -923,7 +923,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		textAreaSerial.append(line);
 		textAreaSerial.selectAll();
-		appendMessage("Line recived from port :" + portname);
+		//appendMessage("Line recived from port :" + portname);
 
 		if (chckbxWriteToFile.isSelected())
 			if (outFile != null) {
@@ -1002,7 +1002,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 * 
 	 * @param msg
 	 */
-	void log(String msg) {
+	void logToConsole(String msg) {
 		// System.out.println(msg);
 	}
 
@@ -1031,6 +1031,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Date date = new Date();
 		String day = dateFormat.format(date);
+		appendMessage("Line recived from port :" + portname);
 		if (logfile != null) {
 			logfile.write(String.format("[%s][%s] %s \n", day, methodname, msg));
 		}
@@ -1041,7 +1042,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 */
 	public void stateChanged(ChangeEvent e) {
 		JSlider source = (JSlider) e.getSource();
-		log(source.getName());
+		logToConsole(source.getName());
 		if (!source.getValueIsAdjusting()) {
 			int value = (int) source.getValue();
 			String msg = source.getName() + ":" + String.valueOf(value);
