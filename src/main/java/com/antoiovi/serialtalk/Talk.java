@@ -194,7 +194,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JButton btnOpen;
 	private JCheckBox chckbxLogDebug;
 
-	PrintWriter outFile;
+	PrintWriter outPrintWriter;
 
 	String WorkingDir;
 
@@ -203,6 +203,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JButton btnCheckPorts;
 
 	private JCheckBox chckbxAdvanceConfig;
+
+	private JCheckBox chckbxGenerateFile;
 
 	/**
 	 * Launch the application.
@@ -233,8 +235,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 					if (serial != null)
 						serial.dispose();
-					if (outFile != null)
-						outFile.close();
+					if (outPrintWriter != null)
+						outPrintWriter.close();
 					if (logFile != null)
 						logFile.close();
 				} catch (IOException e1) {
@@ -370,6 +372,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		});
 
 		panel_1.add(panel_9);
+
+		chckbxGenerateFile = new JCheckBox("Create output  file");
+		chckbxGenerateFile.setSelected(true);
+		panel_9.add(chckbxGenerateFile);
 
 		chckbxWriteToFile = new JCheckBox("Write to  file");
 		chckbxWriteToFile.setSelected(true);
@@ -633,10 +639,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 * GENERATE NEW NAME OF DATA OUTPUT FILE AND OPEN IT 
 	 */
 	void initOutputFile() {
-		
+		if(!chckbxGenerateFile.isSelected())
+			return;
 		String fileName = this.generateFileName();
 		try {
-			outFile = new PrintWriter(fileName);
+			outPrintWriter = new PrintWriter(fileName);
 			app.fileName=fileName;
 			app.appendMessage("OutPut file : " + fileName + "  Created !!");
 			log("initOutputFile", "outPut file : " + fileName + "  Created!! ", logFile);
@@ -679,6 +686,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		btnTestConnection.setEnabled(!connectionOpend);
 		btnOpen.setEnabled(!connectionOpend);
 		comboBoxFileExt.setEnabled(!connectionOpend);
+		chckbxWriteToFile.setEnabled(chckbxGenerateFile.isSelected());
+		chckbxGenerateFile.setEnabled(!connectionOpend);
 		if(connectionOpend)
 			app.setTitle(portname);
 		else
@@ -813,10 +822,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	void openFileToWrite() {
 		try {
-			outFile = new PrintWriter(fileName);
+			outPrintWriter = new PrintWriter(fileName);
 			log("openFileToWrite()"," File opened successfully:" + fileName, logFile);
 		} catch (FileNotFoundException e) {
-			outFile = null;
+			outPrintWriter = null;
 			textAreaControl.append(e.toString());
 			textAreaControl.append("Error..... Can't open output file !!!");
 			log("openFileToWrite()","ERROR :"+"FileNotFoundException - Can't open output file :" + fileName, logFile);
@@ -894,9 +903,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	void closeOutputFile() {
 		if(testingConnection)
 			return;
-		if (outFile != null) {
-			outFile.close();
+		if (outPrintWriter != null ) {
+			outPrintWriter.close();
 			appendMessage("Closed file " + fileName);
+			outPrintWriter=null;
 		}
 
 	}
@@ -938,10 +948,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		textAreaSerial.selectAll();
 		//appendMessage("Line recived from port :" + portname);
 
-		if (chckbxWriteToFile.isSelected())
-			if (outFile != null) {
-				outFile.print(line);
-				outFile.flush();
+		if (chckbxWriteToFile.isSelected() && chckbxWriteToFile.isSelected())
+			if (outPrintWriter != null) {
+				outPrintWriter.print(line);
+				outPrintWriter.flush();
 			}
 
 		logDebug("readFromSerial", line, logFile);
