@@ -118,6 +118,9 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	Pair[] parity_options = { new Pair("NONE", SerialPort.PARITY_NONE), new Pair("EVEN", SerialPort.PARITY_EVEN),
 			new Pair("MARK", SerialPort.PARITY_MARK), new Pair("SPACE", SerialPort.PARITY_SPACE) };
 
+	String[] file_extensions = { "dat", "txt", "csv" };
+
+	
 	public static final int PARITY_NONE = 0;
 	public static final int PARITY_ODD = 1;
 	public static final int PARITY_EVEN = 2;
@@ -137,6 +140,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JComboBox comboBoxParityBits;
 	private JComboBox comboBoxDataBits;
 	private JComboBox comboBoxStopBits;
+	private JComboBox comboBoxFileExt;
+
 	private JCheckBox chckbxRTS;
 	private JCheckBox chckbxDTR;
 	private JPanel panel_1;
@@ -366,7 +371,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		panel_1.add(panel_9);
 
-		chckbxWriteToFile = new JCheckBox("Write recived bytes to  file");
+		chckbxWriteToFile = new JCheckBox("Write to  file");
 		chckbxWriteToFile.setSelected(true);
 		chckbxWriteToFile.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
@@ -379,8 +384,13 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			}
 
 		});
-
 		panel_9.add(chckbxWriteToFile);
+
+		JLabel lblFileExt = new JLabel("File extension:");
+		panel_9.add(lblFileExt);
+		comboBoxFileExt = new JComboBox(new DefaultComboBoxModel(file_extensions));
+		comboBoxFileExt.setEnabled(true);
+		panel_9.add(comboBoxFileExt);
 
 		chckbxLogDebug = new JCheckBox("Loglevel=Debug");
 		chckbxLogDebug.addItemListener(new ItemListener() {
@@ -668,6 +678,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		this.connectionOpend = connectionOpend;
 		btnTestConnection.setEnabled(!connectionOpend);
 		btnOpen.setEnabled(!connectionOpend);
+		comboBoxFileExt.setEnabled(!connectionOpend);
 		if(connectionOpend)
 			app.setTitle(portname);
 		else
@@ -814,6 +825,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	String generateFileName() {
+		String file_ext=(String) comboBoxFileExt.getSelectedItem();
+
 		final String fileprefix = "SerialData_";
 		int x = 1;
 		String Dir = WorkingDir;
@@ -827,7 +840,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		String suffix;
 		while (true) {
 			boolean contains = false;
-			suffix = "_" + today + "-" + String.valueOf(x) + ".dat";
+			suffix = "_" + today + "-" + String.valueOf(x) + "."+file_ext;
 
 			for (int ir = 0; ir < matchingFiles.length; ir++) {
 				// appendMessage(matchingFiles[ir].toString());
@@ -839,11 +852,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					contains = true;
 					break;
 				}
-				suffix = "_" + today + "-" + String.valueOf(x) + ".dat";
+				suffix = "_" + today + "-" + String.valueOf(x)  + "."+file_ext;
 			}
 			if (contains)
 				continue;
-			suffix = "_" + today + "-" + String.valueOf(x) + ".dat";
+			suffix = "_" + today + "-" + String.valueOf(x)  + "."+file_ext;
 			break;
 		}
 		// appendMessage(fileprefix + suffix);
