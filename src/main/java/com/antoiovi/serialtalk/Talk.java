@@ -667,6 +667,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	public void setConnectionOpend(boolean connectionOpend) {
 		this.connectionOpend = connectionOpend;
 		btnTestConnection.setEnabled(!connectionOpend);
+		btnOpen.setEnabled(!connectionOpend);
+		if(connectionOpend)
+			app.setTitle(portname);
+		else
+			app.setTitle("");
 	}
 
 	/**
@@ -674,7 +679,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 */
 	private void openConnection() {
 		
-		boolean test = false;
 		String methodname="openConnection";
 		
 		if (serial != null) {
@@ -685,7 +689,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					serial.open();
 					if(app.isTestingConnection()) return;
 					initOutputFile();
-					app.setTitle(portname);
 					app.setConnectionOpend(true);
 					}
 			} catch (SerialException e) {
@@ -701,7 +704,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					if(app.isTestingConnection()) return;
 
 					initOutputFile();
-					app.setTitle(portname);
 					app.setConnectionOpend(true);
 					log(methodname,"Port opened successfully!!:" + portname, logFile);
 				} else {
@@ -722,7 +724,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					app.appendMessage("Port opened successfully!!:" + portname);
 					if(app.isTestingConnection()) return;
 					initOutputFile();
-					app.setTitle(portname);
 					app.setConnectionOpend(true);
 
 					log("Open()", " Port opened successfully!!:" + portname, logFile);
@@ -860,7 +861,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 				if(serial.portIsOpened()) {
 				serial.dispose();
 				appendMessage("Port closed :"+portname);
-				app.setTitle("");
 				app.setConnectionOpend(false);
 				closeOutputFile();
 				}else {
