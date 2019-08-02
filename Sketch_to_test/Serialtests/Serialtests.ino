@@ -35,29 +35,26 @@ int readline(int readch, char *buffer, int len) {
     }
     return 0;
 }
-
+int ON=0;
+int OFF=1;
+int Switch_1=1;
+int X=0;
 void loop() {
 if (readline(Serial.read(), buf, 80) > 0) {
          String str=String(buf);
-      if(str=="A"){
+      if(str=="Switch_1-ON"){
       
-             Serial.println("Ricevuto_A");
+          Switch_1=ON;
 
-      }else if(str=="B"){
-               Serial.println("Ricevuto_B");
-      }else if(str=="C"){
-              Serial.println("Ricevuto_C");
-      }else if(str=="D"){
-              Serial.println("Ricevuto_C");
-      }else{
-              Serial.println("RICEVUTO... :"+str);
-     }
- 
-     
+      }else if(str=="Switch_1-OFF"){
+                  Switch_1=OFF;
+      }    
     }
 
+if(Switch_1==ON){
+  Serial.println(X);
+}
+X=(X<1000?++X:0);
 /************************************************/
       delay(10);                      
 }
-
-
