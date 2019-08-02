@@ -119,6 +119,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			new Pair("MARK", SerialPort.PARITY_MARK), new Pair("SPACE", SerialPort.PARITY_SPACE) };
 
 	String[] file_extensions = { "dat", "txt", "csv" };
+	String[] line_endings = { "No Line Ending", "NewLine", "Carriage Return", "Both NL &CR"};
 
 	
 	public static final int PARITY_NONE = 0;
@@ -141,6 +142,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JComboBox comboBoxDataBits;
 	private JComboBox comboBoxStopBits;
 	private JComboBox comboBoxFileExt;
+	
+	private JComboBox cboxAppendToMessage;
+	private JComboBox cboxAppendToRecived;
+
 
 	private JCheckBox chckbxRTS;
 	private JCheckBox chckbxDTR;
@@ -205,6 +210,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JCheckBox chckbxAdvanceConfig;
 
 	private JCheckBox chckbxGenerateFile;
+
+	private JCheckBox chckbxAutoscroll;
 
 	/**
 	 * Launch the application.
@@ -333,6 +340,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_1.add(panel_8);
 
 		btnTestConnection = new JButton("Test Conn.");
+		btnTestConnection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				app.testConnection();
+			}
+		});
 		panel_8.add(btnTestConnection);
 
 		btnOpen = new JButton("Open conn.");
@@ -351,12 +363,18 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			}
 		});
 
-		btnTestConnection.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				app.testConnection();
-			}
-		});
-
+		//LINE ENDING MESSAGE RECIVED
+		JLabel lblAppendToRec = new JLabel("Append:");
+		panel_8.add(lblAppendToRec);
+		cboxAppendToRecived = new JComboBox(new DefaultComboBoxModel(line_endings));
+		cboxAppendToRecived.setSelectedIndex(0);
+		panel_8.add(cboxAppendToRecived);
+		
+		
+		chckbxAutoscroll = new JCheckBox("Autoscroll");
+		chckbxAutoscroll.setEnabled(true);
+		panel_8.add(chckbxAutoscroll);
+		
 		/************************************
 		 * PANEL 9 : Log out configurations
 		 **********************************/
@@ -372,11 +390,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		});
 
 		panel_1.add(panel_9);
-
+		//GENERATE FILE
 		chckbxGenerateFile = new JCheckBox("Create output  file");
 		chckbxGenerateFile.setSelected(true);
 		panel_9.add(chckbxGenerateFile);
-
+		//WRITE TO FILE
 		chckbxWriteToFile = new JCheckBox("Write to  file");
 		chckbxWriteToFile.setSelected(true);
 		chckbxWriteToFile.addItemListener(new ItemListener() {
@@ -391,13 +409,14 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		});
 		panel_9.add(chckbxWriteToFile);
-
+		
+		// 	FILE EXTENSION
 		JLabel lblFileExt = new JLabel("File extension:");
 		panel_9.add(lblFileExt);
 		comboBoxFileExt = new JComboBox(new DefaultComboBoxModel(file_extensions));
 		comboBoxFileExt.setEnabled(true);
 		panel_9.add(comboBoxFileExt);
-
+		//LOGELEVEL DEBUG
 		chckbxLogDebug = new JCheckBox("Loglevel=Debug");
 		chckbxLogDebug.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent itemEvent) {
@@ -525,6 +544,16 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		textToSend = new JTextField();
 		panel_7.add(textToSend);
 		textToSend.setColumns(10);
+		
+		// LINE ENDINGS FOR MESSAGE TO PORT
+		JLabel lblAppendTo = new JLabel("Append to port:");
+		panel_7.add(lblAppendTo);
+		cboxAppendToMessage = new JComboBox(new DefaultComboBoxModel(line_endings));
+		panel_7.add(cboxAppendToMessage);
+		cboxAppendToMessage.setSelectedIndex(1);
+		
+		
+		
 		/*******
 		 * PANEL 6 : Text Area Control and Serial arrive
 		 */
@@ -921,12 +950,29 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		textAreaSerial.setText("");
 
 	}
-
+/**
+ * Write to Srial Port
+ * @param str
+ */
 	void writeToSerial(String str) {
+		String app="";
 		try {
-			serial.write(str);
+			 switch (cboxAppendToMessage.getSelectedIndex()) {
+		        case 1:
+		          app += "\n";
+		          break;
+		        case 2:
+		          app += "\r";
+		          break;
+		        case 3:
+		          app += "\r\n";
+		          break;
+		        default:
+		          break;
+		}
+			serial.write(str+app);
 			// Add new line to string
-			serial.write('\n');
+			//serial.write('\n');
 			appendMessage("Sent to serial port " + portname + " : " + str);
 			log("writeToSErial", str, logFile);
 
@@ -943,9 +989,24 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 * @param line
 	 */
 	synchronized public void setMessage(String line) {
-
-		textAreaSerial.append(line);
-		textAreaSerial.selectAll();
+		String app="";
+		
+			 switch (cboxAppendToRecived.getSelectedIndex()) {
+		        case 1:
+		          app += "\n";
+		          break;
+		        case 2:
+		          app += "\r";
+		          break;
+		        case 3:
+		          app += "\r\n";
+		          break;
+		        default:
+		          break;
+		}
+		textAreaSerial.append(line+app);
+		if(chckbxAutoscroll.isSelected())
+			textAreaSerial.selectAll();
 		//appendMessage("Line recived from port :" + portname);
 
 		if (chckbxWriteToFile.isSelected() && chckbxWriteToFile.isSelected())
