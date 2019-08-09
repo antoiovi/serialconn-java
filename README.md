@@ -60,7 +60,7 @@ con la struttura dei file indicata sopra .
 
 'E presente uno script per utenti Linux che crea automaticamente i file zip e tar.
 
-
+	Talk_zip_tar-x.x.sh
 
 
 #### Utenti Linux
