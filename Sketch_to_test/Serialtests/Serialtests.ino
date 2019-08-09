@@ -42,6 +42,7 @@ int Trimmer1=50;
 int X=0;
 int M=1;
 void loop() {
+ 
 if (readline(Serial.read(), buf, 80) > 0) {
          String str=String(buf);
       if(str=="Switch_1-ON"){
