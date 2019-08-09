@@ -38,21 +38,30 @@ La mia pagina di riferimento dove viene spiagto il codice :
  Esecuzione :
 		
 		
-		serialconn-java$ java -jar target/Talk.jar 	
+		serialconn-java$ java -jar target/Talk-1.1.jar 	
 
-Per esporatre il programma una vlota compilato come sopra, copiare in una directory il file Talk.jar e la directory con il file di libreria: lib/jscc-2.8.0.jar
+Per esporatre il programma una volta compilato come sopra, copiare in una directory il file Talk-x.x.jar la directory con il file di libreria: lib/jscc-2.8.0.jar
 
 Si avara' una struttura di lavoro :
 
 	workdir
-	|-Talk.jar
+	|-Talk-x.xjar
 	L_ lib/
 		L jscc-2.8.0.jar
 				
 Aprire un terminale in working dir ed eseguire:
 
- 		`  workingdir$ java -jar Talk.jar`
+ 		`  workingdir$ java -jar Talk-x.x.jar`
 			
+
+Per esportare il programma creare un file tar ( per utenti Linux ) ed un file zip (per utenti Windows)
+con la struttura dei file indicata sopra .
+
+
+'E presente uno script per utenti Linux che crea automaticamente i file zip e tar.
+
+
+
 
 #### Utenti Linux
   
@@ -64,6 +73,21 @@ Aprire un terminale in working dir ed eseguire:
 
   Assegnare i privilegi con chmod 
 			
-	$sudo chmod 666 /dev/ttyUSB0
+	$ sudo chmod 666 /dev/ttyUSB0
+ 
+#### Revisioni
+
+### Versione 1 revisione 1
+ 	
+ 
+ * Sono visualizzati solo i nomi delle porte effettivamente presenti sul sistema
+ * Vengono resi opzionali le configurazione avanzate
+ * Risolto alcuni piccoli bachi
+ 
+### Versione 1 revisione 2
+
+ * Aggiunta la possibilita' di cambiare l'estensione del nome del file
+ * Aggiunte le opzioni di fine linea nelle stringhe di invio e di arrivo
  
  
+

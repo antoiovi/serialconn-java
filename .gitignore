@@ -174,3 +174,7 @@ tags
 
 # End of https://www.gitignore.io/api/java,maven
 
+#Added for file Talk antoiovi
+*.txt
+*.csv
+*.dat
