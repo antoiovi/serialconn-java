@@ -252,7 +252,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 				}
 			}
 		});
-		setBounds(100, 100, 650, 500);
+		setBounds(100, 100, 750, 500);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -578,6 +578,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_6.add(scrollPane_1);
 		scrollPane_1.setAutoscrolls(true);
 
+		/*
+		 * JPanel panelctrOut=new JPanel(); panelctrOut.add(chckbxAutoscroll);
+		 * panelctrOut.add(cboxAppendToRecived); panel_6.add(panelctrOut);
+		 */
+
 		/**
 		 * PopUp menu to copy serial data to clipboard
 		 */
@@ -731,12 +736,22 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		txtFilename.setEnabled(!connectionOpend);
 		chckbxWriteToFile.setEnabled(chckbxGenerateFile.isSelected());
 		chckbxGenerateFile.setEnabled(!connectionOpend);
+
+		comboBoxBaudrate.setEnabled(!connectionOpend);
+		comboBoxPortname.setEnabled(!connectionOpend);
+		chckbxAdvanceConfig.setEnabled(!connectionOpend);
+		if (chckbxAdvanceConfig.isSelected()) {
+			chckbxDTR.setEnabled(!connectionOpend);
+			chckbxRTS.setEnabled(!connectionOpend);
+			comboBoxDataBits.setEnabled(!connectionOpend);
+			comboBoxParityBits.setEnabled(!connectionOpend);
+			comboBoxStopBits.setEnabled(!connectionOpend);
+		}
 		if (connectionOpend)
 			app.setTitle(portname);
 		else
 			app.setTitle("");
 	}
-	
 
 	/**
 	 * Open serial port
