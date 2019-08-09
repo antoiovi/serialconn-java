@@ -141,7 +141,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JComboBox comboBoxParityBits;
 	private JComboBox comboBoxDataBits;
 	private JComboBox comboBoxStopBits;
-	private JComboBox comboBoxFileExt;
 
 	private JComboBox cboxAppendToMessage;
 	private JComboBox cboxAppendToRecived;
@@ -410,17 +409,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		});
 		panel_9.add(chckbxWriteToFile);
 
-		// FILE EXTENSION
-
-		comboBoxFileExt = new JComboBox(new DefaultComboBoxModel(file_extensions));
-		comboBoxFileExt.setEnabled(true);
-
 		// FILE Name
 		JLabel lblFileExt = new JLabel("File name");
 		panel_9.add(lblFileExt);
 		txtFilename = new JTextField();
 		panel_9.add(txtFilename);
-		panel_9.add(comboBoxFileExt);
 
 		// LOGELEVEL DEBUG
 		chckbxLogDebug = new JCheckBox("Loglevel=Debug");
@@ -735,7 +728,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		this.connectionOpend = connectionOpend;
 		btnTestConnection.setEnabled(!connectionOpend);
 		btnOpen.setEnabled(!connectionOpend);
-		comboBoxFileExt.setEnabled(!connectionOpend);
+		txtFilename.setEnabled(!connectionOpend);
 		chckbxWriteToFile.setEnabled(chckbxGenerateFile.isSelected());
 		chckbxGenerateFile.setEnabled(!connectionOpend);
 		if (connectionOpend)
@@ -743,6 +736,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		else
 			app.setTitle("");
 	}
+	
 
 	/**
 	 * Open serial port
