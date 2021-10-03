@@ -89,5 +89,9 @@ con la struttura dei file indicata sopra .
  * Aggiunta la possibilita' di cambiare l'estensione del nome del file
  * Aggiunte le opzioni di fine linea nelle stringhe di invio e di arrivo
  
+ ### Versione 1 revisione 3
  
+ * Messo versione java 1.7
+ * Aggiunto l'opzione per nascondere i pulsanti 
+ * Aggiunto properties
 

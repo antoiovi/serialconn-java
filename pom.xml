@@ -5,7 +5,7 @@
 
 	<groupId>com.antoiovi</groupId>
 	<artifactId>serial</artifactId>
-	<version>1.2</version>
+	<version>1.3</version>
 	<packaging>jar</packaging>
 
 	<name>serial</name>
@@ -13,6 +13,8 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		   <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 
 	<dependencies>
@@ -30,6 +32,7 @@
 	</dependencies>
 	<build>
 				<plugins>
+				
 				<!-- maven dependency plugin : per scaricare le dependencies in cartella 
 				locale -->
 			<plugin>

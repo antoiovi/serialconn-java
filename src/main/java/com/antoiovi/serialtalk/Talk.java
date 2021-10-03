@@ -44,12 +44,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.Date;
+import java.util.Properties;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +63,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.ItemSelectable;
 
 import javax.swing.JSlider;
@@ -85,8 +90,9 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
+import javax.swing.JSplitPane;
 
-public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener {
+public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener,ItemListener {
 
 	/**
 	 * 
@@ -438,7 +444,9 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_2 = new JPanel();
 		getContentPane().add(panel_2, BorderLayout.WEST);
 		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
-
+		chckbxHideButtons = new JCheckBox("Hide buttons");
+		chckbxHideButtons.addItemListener(this);
+		panel_2.add(chckbxHideButtons);
 		// PANEL 3 Buttons
 		panel_3 = new JPanel();
 		panel_2.add(panel_3);
@@ -464,47 +472,30 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_4.setLayout(new GridLayout(3, 2, 0, 0));
 
 		tglbtnOnoff1 = new JToggleButton("Switch 1");
-		// tglbtnOnoff1.setSelectedIcon(new
-		// ImageIcon(Talk.class.getResource("/com/antoiovi/serialtalk/ON.png")));
-		// tglbtnOnoff1.setIcon(new
-		// ImageIcon(Talk.class.getResource("/com/antoiovi/serialtalk/OFF.png")));
-		// tglbtnOnoff1.setIcon(new
-		// ImageIcon(getClass().getResource("/com/antoiovi/icons/switch-off-icon.png")));
-
+		tglbtnOnoff1.setSelectedIcon(new ImageIcon(getImage("icons/ON.png")));
+		tglbtnOnoff1.setIcon(new ImageIcon(getImage("icons/OFF.png")));
 		tglbtnOnoff1.addActionListener(this);
 		tglbtnOnoff1.setActionCommand("Switch_1");
-		// tglbtnOnoff1.setIcon(new
-		// ImageIcon(Talk.class.getResource("/com/antoiovi/icons/switch-on-icon.png")));
-		// tglbtnOnoff1.setSelectedIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
 		panel_4.add(tglbtnOnoff1);
 
 		tglbtnOnoff2 = new JToggleButton("Switch  2");
-
+		tglbtnOnoff2.setSelectedIcon(new ImageIcon(getImage("icons/ON.png")));
+		tglbtnOnoff2.setIcon(new ImageIcon(getImage("icons/OFF.png")));
 		tglbtnOnoff2.setActionCommand("Switch_2");
-		// tglbtnOnoff2.setIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
-		// tglbtnOnoff2.setSelectedIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
 		tglbtnOnoff2.addActionListener(this);
 		panel_4.add(tglbtnOnoff2);
 
 		tglbtnOnoff3 = new JToggleButton("Switch 3");
-
+		tglbtnOnoff3.setSelectedIcon(new ImageIcon(getImage("icons/ON.png")));
+		tglbtnOnoff3.setIcon(new ImageIcon(getImage("icons/OFF.png")));
 		tglbtnOnoff3.setActionCommand("Switch_3");
-		// tglbtnOnoff3.setIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
-		// tglbtnOnoff3.setSelectedIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
 		tglbtnOnoff3.addActionListener(this);
 		panel_4.add(tglbtnOnoff3);
 		tglbtnOnoff4 = new JToggleButton("Switch 4");
 
 		tglbtnOnoff4.setActionCommand("Switch_4");
-		// tglbtnOnoff4.setIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-off-icon.png")));
-		// tglbtnOnoff4.setSelectedIcon(new
-		// ImageIcon(Talk.class.getResource("../icons/switch-on-icon.png")));
+		tglbtnOnoff4.setSelectedIcon(new ImageIcon(getImage("icons/ON.png")));
+		tglbtnOnoff4.setIcon(new ImageIcon(getImage("icons/OFF.png")));
 		tglbtnOnoff4.addActionListener(this);
 		panel_4.add(tglbtnOnoff4);
 
@@ -555,14 +546,14 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		 * PANEL 6 : Text Area Control and Serial arrive
 		 */
 		panel_6 = new JPanel();
-		getContentPane().add(panel_6, BorderLayout.CENTER);
+		//getContentPane().add(panel_6, BorderLayout.CENTER);
 		panel_6.setLayout(new GridLayout(2, 1, 0, 0));
 
 		textAreaControl = new JTextArea();
 		textAreaControl.setEditable(false);
 
 		scrollPane = new JScrollPane(textAreaControl);
-		panel_6.add(scrollPane);
+		//panel_6.add(scrollPane);
 		scrollPane.setAutoscrolls(true);
 
 		textAreaSerial = new JTextArea();
@@ -575,8 +566,17 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			}
 		});
 		scrollPane_1 = new JScrollPane(textAreaSerial);
-		panel_6.add(scrollPane_1);
+//		panel_6.add(scrollPane_1);
 		scrollPane_1.setAutoscrolls(true);
+		
+		splitPane = new JSplitPane();
+		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setTopComponent(scrollPane_1);
+	    splitPane.setBottomComponent(scrollPane);
+		splitPane.setDividerLocation(0.5);
+
+		getContentPane().add(splitPane, BorderLayout.CENTER);
 
 		/*
 		 * JPanel panelctrOut=new JPanel(); panelctrOut.add(chckbxAutoscroll);
@@ -601,9 +601,24 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		popupMenu.addPopupMenuListener(new PopupPrintListener());
 
 		init();
-
+pack();
+restoreDefaults();
 	}
+	
+	
+	/***
+	 * Metodo creato per iniziallizzare lo splitPane alla giusta proposrzione, altrimenti non funziona
+	 */
+	 private void restoreDefaults() {
+	        SwingUtilities.invokeLater(new Runnable() {
 
+	            @Override
+	            public void run() {
+	                splitPane.setDividerLocation(splitPane.getSize().height /2);
+	            }
+	        });
+	    }
+	 
 	private void checkPorts() {
 		int x = 0;
 		port_names = this.getPortNames();
@@ -661,6 +676,21 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		} catch (IOException e) {
 			this.appendMessage("IOException : Unable to create log file....");
 
+		}
+	}
+
+	void initProperties() {
+		try (InputStream input = new FileInputStream(WorkingDir + "/config.properties")) {
+			Properties prop = new Properties();
+			// load a properties file
+			prop.load(input);
+			// get the property value and print it out
+			System.out.println(prop.getProperty("db.url"));
+			System.out.println(prop.getProperty("db.user"));
+			System.out.println(prop.getProperty("db.password"));
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
 	}
 
@@ -1119,6 +1149,33 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	/**
+	 * Checkbox , radiobuttons
+	 * 
+	 * @param arg0
+	 */
+	public void itemStateChanged(ItemEvent arg0) {
+		logToConsole("Itenstatechanged");
+		if (arg0.getSource().equals(chckbxHideButtons)) {
+			/**
+			 * Viene chiamato due volte: la prima ottengio il valore deselected La seconda
+			 * il valore selezionato
+			 **/
+			logToConsole("hidebuttons");
+			int state = arg0.getStateChange();
+			logToConsole(String.valueOf(state));
+			
+			setButtonsVisible(state==ItemEvent.DESELECTED)	;
+		}
+	}
+	
+	void setButtonsVisible(boolean visible) {
+		logToConsole(String.valueOf(visible));
+		panel_3.setVisible(visible);
+		panel_4.setVisible(visible);
+		panel_5.setVisible(visible);
+	}
+
+	/**
 	 * Log to system console
 	 * 
 	 * @param msg
@@ -1145,6 +1202,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	boolean LEVEL_DEBUG = false;
+	private JCheckBox chckbxHideButtons;
+	private JSplitPane splitPane;
 
 	void logDebug(String methodname, String msg, PrintWriter logfile) {
 		if (!LEVEL_DEBUG)
@@ -1186,5 +1245,15 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		}
 
+	}
+	
+	/**
+	 * Per recuperare le immagini archiviate nel file jar
+	 * @param pathAndFileName
+	 * @return
+	 */
+	public static Image getImage(final String pathAndFileName) {
+	    final URL url = Thread.currentThread().getContextClassLoader().getResource(pathAndFileName);
+	    return Toolkit.getDefaultToolkit().getImage(url);
 	}
 }
