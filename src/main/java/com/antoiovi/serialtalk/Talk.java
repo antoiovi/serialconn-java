@@ -91,8 +91,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JTextField;
 import javax.swing.JSplitPane;
+import java.awt.FlowLayout;
 
-public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener,ItemListener {
+public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener, ItemListener {
 
 	/**
 	 * 
@@ -444,9 +445,21 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_2 = new JPanel();
 		getContentPane().add(panel_2, BorderLayout.WEST);
 		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
+
+		panel_10 = new JPanel();
+		panel_2.add(panel_10);
+		panel_10.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+
+		btnEditBtnPanel = new JButton("Edit panel");
+		btnEditBtnPanel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editButtonsProperties();
+			}
+		});
+		panel_10.add(btnEditBtnPanel);
 		chckbxHideButtons = new JCheckBox("Hide buttons");
+		panel_10.add(chckbxHideButtons);
 		chckbxHideButtons.addItemListener(this);
-		panel_2.add(chckbxHideButtons);
 		// PANEL 3 Buttons
 		panel_3 = new JPanel();
 		panel_2.add(panel_3);
@@ -546,14 +559,14 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		 * PANEL 6 : Text Area Control and Serial arrive
 		 */
 		panel_6 = new JPanel();
-		//getContentPane().add(panel_6, BorderLayout.CENTER);
+		// getContentPane().add(panel_6, BorderLayout.CENTER);
 		panel_6.setLayout(new GridLayout(2, 1, 0, 0));
 
 		textAreaControl = new JTextArea();
 		textAreaControl.setEditable(false);
 
 		scrollPane = new JScrollPane(textAreaControl);
-		//panel_6.add(scrollPane);
+		// panel_6.add(scrollPane);
 		scrollPane.setAutoscrolls(true);
 
 		textAreaSerial = new JTextArea();
@@ -568,12 +581,12 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		scrollPane_1 = new JScrollPane(textAreaSerial);
 //		panel_6.add(scrollPane_1);
 		scrollPane_1.setAutoscrolls(true);
-		
+
 		splitPane = new JSplitPane();
 		splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
 		splitPane.setOneTouchExpandable(true);
 		splitPane.setTopComponent(scrollPane_1);
-	    splitPane.setBottomComponent(scrollPane);
+		splitPane.setBottomComponent(scrollPane);
 		splitPane.setDividerLocation(0.5);
 
 		getContentPane().add(splitPane, BorderLayout.CENTER);
@@ -601,24 +614,24 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		popupMenu.addPopupMenuListener(new PopupPrintListener());
 
 		init();
-pack();
-restoreDefaults();
+		pack();
+		restoreDefaults();
 	}
-	
-	
-	/***
-	 * Metodo creato per iniziallizzare lo splitPane alla giusta proposrzione, altrimenti non funziona
-	 */
-	 private void restoreDefaults() {
-	        SwingUtilities.invokeLater(new Runnable() {
 
-	            @Override
-	            public void run() {
-	                splitPane.setDividerLocation(splitPane.getSize().height /2);
-	            }
-	        });
-	    }
-	 
+	/***
+	 * Metodo creato per iniziallizzare lo splitPane alla giusta proposrzione,
+	 * altrimenti non funziona
+	 */
+	private void restoreDefaults() {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				splitPane.setDividerLocation(splitPane.getSize().height / 2);
+			}
+		});
+	}
+
 	private void checkPorts() {
 		int x = 0;
 		port_names = this.getPortNames();
@@ -640,6 +653,8 @@ restoreDefaults();
 	 */
 	private void init() {
 		WorkingDir = System.getProperty("user.dir");
+		initProperties();
+
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		today = dateFormat.format(date);
@@ -657,6 +672,8 @@ restoreDefaults();
 		chckbxRTS.setSelected(true);
 		txtFilename.setText(generateFileName());
 		log("init()", "Initilized all.. ", logFile);
+
+		initProperties();
 
 	}
 
@@ -679,21 +696,86 @@ restoreDefaults();
 		}
 	}
 
-	void initProperties() {
+	Properties properties() {
+		Properties prop = new Properties();
 		try (InputStream input = new FileInputStream(WorkingDir + "/config.properties")) {
-			Properties prop = new Properties();
 			// load a properties file
 			prop.load(input);
-			// get the property value and print it out
-			System.out.println(prop.getProperty("db.url"));
-			System.out.println(prop.getProperty("db.user"));
-			System.out.println(prop.getProperty("db.password"));
-
-		} catch (IOException ex) {
-			ex.printStackTrace();
+		} catch (IOException e) {
+			//e.printStackTrace();
+			prop = null;
 		}
+		return prop;
 	}
 
+	Properties propertiesDefault() {
+		Properties prop = new Properties();
+		URL url = ClassLoader.getSystemResource("config/config.properties");
+		if (url != null) {
+			try {
+				prop.load(url.openStream());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				prop = null;
+			}
+		}
+		return prop;
+	}
+
+	
+	/**
+	 * Inizzializza le properies se sono state salvate
+	 */
+	void initProperties() {
+		Properties p = properties();
+		if (p == null)
+			p = propertiesDefault();
+		if (p != null)
+			initProps(p);
+	}
+	
+
+	void initProps(Properties propd) {
+		
+		btnA.setText(propd.getProperty("btn1.text"));
+		btnB.setText(propd.getProperty("btn2.text"));
+		btnC.setText(propd.getProperty("btn3.text"));
+		btnD.setText(propd.getProperty("btn4.text"));
+		btnA.setActionCommand(propd.getProperty("btn1.command"));
+		btnB.setActionCommand(propd.getProperty("btn2.command"));
+		btnC.setActionCommand(propd.getProperty("btn3.command"));
+		btnD.setActionCommand(propd.getProperty("btn4.command"));
+		
+		btnA.setVisible(retriveBooleanProp(propd,"btn1.visible"));
+		btnB.setVisible(retriveBooleanProp(propd,"btn2.visible"));
+		btnC.setVisible(retriveBooleanProp(propd,"btn3.visible"));
+		btnD.setVisible(retriveBooleanProp(propd,"btn4.visible"));
+		tglbtnOnoff1.setText(propd.getProperty("tglbtn1.text"));
+		tglbtnOnoff2.setText(propd.getProperty("tglbtn2.text"));
+		tglbtnOnoff3.setText(propd.getProperty("tglbtn3.text"));
+		tglbtnOnoff4.setText(propd.getProperty("tglbtn4.text"));
+
+		tglbtnOnoff1.setActionCommand(propd.getProperty("tglbtn1.text"));
+		tglbtnOnoff2.setActionCommand(propd.getProperty("tglbtn2.text"));
+		tglbtnOnoff3.setActionCommand(propd.getProperty("tglbtn3.text"));
+		tglbtnOnoff4.setActionCommand(propd.getProperty("tglbtn4.text"));
+
+		tglbtnOnoff1.setVisible(retriveBooleanProp(propd,"tglbtn1.visible"));
+		tglbtnOnoff2.setVisible(retriveBooleanProp(propd,"tglbtn2.visible"));
+		tglbtnOnoff3.setVisible(retriveBooleanProp(propd,"tglbtn3.visible"));
+		tglbtnOnoff4.setVisible(retriveBooleanProp(propd,"tglbtn4.visible"));
+	
+		}
+
+	boolean retriveBooleanProp(Properties p,String pname) {
+		String val=p.getProperty(pname);
+		if(val!=null)
+			return val.equals("true");
+		 else
+			 return false;
+	}
+	
 	/**
 	 * GENERATE NEW NAME OF DATA OUTPUT FILE AND OPEN IT
 	 */
@@ -770,6 +852,7 @@ restoreDefaults();
 		comboBoxBaudrate.setEnabled(!connectionOpend);
 		comboBoxPortname.setEnabled(!connectionOpend);
 		chckbxAdvanceConfig.setEnabled(!connectionOpend);
+		btnEditBtnPanel.setEnabled(!connectionOpend);
 		if (chckbxAdvanceConfig.isSelected()) {
 			chckbxDTR.setEnabled(!connectionOpend);
 			chckbxRTS.setEnabled(!connectionOpend);
@@ -1163,11 +1246,11 @@ restoreDefaults();
 			logToConsole("hidebuttons");
 			int state = arg0.getStateChange();
 			logToConsole(String.valueOf(state));
-			
-			setButtonsVisible(state==ItemEvent.DESELECTED)	;
+
+			setButtonsVisible(state == ItemEvent.DESELECTED);
 		}
 	}
-	
+
 	void setButtonsVisible(boolean visible) {
 		logToConsole(String.valueOf(visible));
 		panel_3.setVisible(visible);
@@ -1204,6 +1287,8 @@ restoreDefaults();
 	boolean LEVEL_DEBUG = false;
 	private JCheckBox chckbxHideButtons;
 	private JSplitPane splitPane;
+	private JButton btnEditBtnPanel;
+	private JPanel panel_10;
 
 	void logDebug(String methodname, String msg, PrintWriter logfile) {
 		if (!LEVEL_DEBUG)
@@ -1246,14 +1331,21 @@ restoreDefaults();
 		}
 
 	}
-	
+
 	/**
 	 * Per recuperare le immagini archiviate nel file jar
+	 * 
 	 * @param pathAndFileName
 	 * @return
 	 */
 	public static Image getImage(final String pathAndFileName) {
-	    final URL url = Thread.currentThread().getContextClassLoader().getResource(pathAndFileName);
-	    return Toolkit.getDefaultToolkit().getImage(url);
+		final URL url = Thread.currentThread().getContextClassLoader().getResource(pathAndFileName);
+		return Toolkit.getDefaultToolkit().getImage(url);
+	}
+
+	void editButtonsProperties() {
+		EditButtons edb = new EditButtons();
+		edb.setVisible(true);
+
 	}
 }
