@@ -33,6 +33,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
@@ -43,6 +44,7 @@ import javax.swing.BoxLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -410,47 +412,80 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		tglbtnPrintSerialInput.setSelectedIcon(new ImageIcon(getImage("icons/ON.png")));
 		tglbtnPrintSerialInput.setIcon(new ImageIcon(getImage("icons/OFF.png")));
 		panel_9.add(tglbtnPrintSerialInput);
+		
+		/********
+		 * Save to file
+		 */
+		btnSaveToFile = new JButton("Save to file");
+		btnSaveToFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fc = new JFileChooser();
+				fc.setApproveButtonText("Save");
+				int returnVal = fc.showOpenDialog(app);
+				if (returnVal == JFileChooser.APPROVE_OPTION) {
+		            File file = fc.getSelectedFile();
+		            File fileName = new File(fc.getSelectedFile() + ".txt");
+		            BufferedWriter outFile = null;
+		            try {
+		               outFile = new BufferedWriter(new FileWriter(fileName));
+		               textAreaSerial.write(outFile);   // *** here: ***
+		            } catch (IOException ex) {
+		               ex.printStackTrace();
+		            } finally {
+		               if (outFile != null) {
+		                  try {
+		                     outFile.close();
+		                  } catch (IOException eioex) {
+		                     // one of the few times that I think that it's OK
+		                     // to leave this blank
+		                  }
+		               }
+		            }
+		         
+		        } else {
+		           // log.append("Open command cancelled by user." + newline);
+		        }
+
+			}
+		});
+
+		panel_9.add(btnSaveToFile);
 		// GENERATE FILE
-		chckbxGenerateFile = new JCheckBox("Create output  file");
-		chckbxGenerateFile.setSelected(true);
-		panel_9.add(chckbxGenerateFile);
-		// WRITE TO FILE
-		chckbxWriteToFile = new JCheckBox("Write to  file");
-		chckbxWriteToFile.setSelected(true);
-		chckbxWriteToFile.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
-				boolean test = chckbxWriteToFile.isSelected();
-				if (test)
-					appendMessage("The bytes recived will be Sent to SerialaData_xx.dat File");
-				else
-					appendMessage("The bytes recived will NOT BE Sent to SerialaData_xx.dat File");
+		/*
+		 * chckbxGenerateFile = new JCheckBox("Create output  file");
+		 * chckbxGenerateFile.setSelected(true); panel_9.add(chckbxGenerateFile); //
+		 * WRITE TO FILE chckbxWriteToFile = new JCheckBox("Write to  file");
+		 * chckbxWriteToFile.setSelected(true); chckbxWriteToFile.addItemListener(new
+		 * ItemListener() { public void itemStateChanged(ItemEvent itemEvent) { boolean
+		 * test = chckbxWriteToFile.isSelected(); if (test)
+		 * appendMessage("The bytes recived will be Sent to SerialaData_xx.dat File");
+		 * else
+		 * appendMessage("The bytes recived will NOT BE Sent to SerialaData_xx.dat File"
+		 * );
+		 * 
+		 * }
+		 * 
+		 * }); panel_9.add(chckbxWriteToFile);
+		 */
 
-			}
-
-		});
-		panel_9.add(chckbxWriteToFile);
-
-		// FILE Name
-		JLabel lblFileExt = new JLabel("File name");
-		panel_9.add(lblFileExt);
-		txtFilename = new JTextField();
-		panel_9.add(txtFilename);
-
-		// LOGELEVEL DEBUG
-		chckbxLogDebug = new JCheckBox("Loglevel=Debug");
-		chckbxLogDebug.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent itemEvent) {
-				LEVEL_DEBUG = chckbxLogDebug.isSelected();
-				if (LEVEL_DEBUG)
-					appendMessage("The bytes recived will also been written to log file...");
-				else
-					appendMessage("The bytes recived will NOT BE written to log file...");
-
-			}
-
-		});
-
-		panel_9.add(chckbxLogDebug);
+		/*
+		 * // FILE Name JLabel lblFileExt = new JLabel("File name");
+		 * panel_9.add(lblFileExt); txtFilename = new JTextField();
+		 * panel_9.add(txtFilename);
+		 * 
+		 * // LOGELEVEL DEBUG chckbxLogDebug = new JCheckBox("Loglevel=Debug");
+		 * chckbxLogDebug.addItemListener(new ItemListener() { public void
+		 * itemStateChanged(ItemEvent itemEvent) { LEVEL_DEBUG =
+		 * chckbxLogDebug.isSelected(); if (LEVEL_DEBUG)
+		 * appendMessage("The bytes recived will also been written to log file...");
+		 * else appendMessage("The bytes recived will NOT BE written to log file...");
+		 * 
+		 * }
+		 * 
+		 * });
+		 * 
+		 * panel_9.add(chckbxLogDebug);
+		 */
 
 		/*********************************
 		 * PANEL 2 : BOTTONS COMMANDS to serial
@@ -684,7 +719,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		comboBoxParityBits.setSelectedItem(parity_options[PARITY_NONE]);
 		chckbxDTR.setSelected(true);
 		chckbxRTS.setSelected(true);
-		txtFilename.setText(generateFileName());
+		//txtFilename.setText(generateFileName());
 		log("init()", "Initilized all.. ", logFile);
 
 		initProperties();
@@ -813,39 +848,28 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	/**
 	 * GENERATE NEW NAME OF DATA OUTPUT FILE AND OPEN IT
 	 */
-	void initOutputFile() {
-		if (!chckbxGenerateFile.isSelected())
-			return;
-		String fileName = txtFilename.getText();
-		Pattern p = Pattern.compile("[a-zA-Z_0-9\\-.]*");
-
-		Matcher m = p.matcher(fileName);
-		boolean isvalidname = m.matches();
-		File f = new File(fileName);
-		if (!isvalidname || fileName.isEmpty()) {
-			app.appendMessage("Invalid file name. New name will be generated");
-			fileName = this.generateFileName();
-			app.appendMessage("File " + fileName + " will be created.");
-			txtFilename.setText(fileName);
-		}
-
-		if (f.exists() && !f.isDirectory()) {
-			app.appendMessage("File " + fileName + " already exists .New file name will be generated");
-			fileName = this.generateFileName();
-			app.appendMessage("File " + fileName + " will be created.");
-			txtFilename.setText(fileName);
-		}
-		try {
-			outPrintWriter = new PrintWriter(fileName);
-			app.fileName = fileName;
-			app.appendMessage("OutPut file : " + fileName + "  Created !!");
-			log("initOutputFile", "outPut file : " + fileName + "  Created!! ", logFile);
-		} catch (FileNotFoundException e) {
-			app.appendMessage("Unable to create outPut file....");
-			log("initOutputFile", "Unable to create outPut file....", logFile);
-			logToConsole(e.toString());
-		}
-	}
+	/*
+	 * void initOutputFile() { if (!chckbxGenerateFile.isSelected()) return; String
+	 * fileName = txtFilename.getText(); Pattern p =
+	 * Pattern.compile("[a-zA-Z_0-9\\-.]*");
+	 * 
+	 * Matcher m = p.matcher(fileName); boolean isvalidname = m.matches(); File f =
+	 * new File(fileName); if (!isvalidname || fileName.isEmpty()) {
+	 * app.appendMessage("Invalid file name. New name will be generated"); fileName
+	 * = this.generateFileName(); app.appendMessage("File " + fileName +
+	 * " will be created."); txtFilename.setText(fileName); }
+	 * 
+	 * if (f.exists() && !f.isDirectory()) { app.appendMessage("File " + fileName +
+	 * " already exists .New file name will be generated"); fileName =
+	 * this.generateFileName(); app.appendMessage("File " + fileName +
+	 * " will be created."); txtFilename.setText(fileName); } try { outPrintWriter =
+	 * new PrintWriter(fileName); app.fileName = fileName;
+	 * app.appendMessage("OutPut file : " + fileName + "  Created !!");
+	 * log("initOutputFile", "outPut file : " + fileName + "  Created!! ", logFile);
+	 * } catch (FileNotFoundException e) {
+	 * app.appendMessage("Unable to create outPut file...."); log("initOutputFile",
+	 * "Unable to create outPut file....", logFile); logToConsole(e.toString()); } }
+	 */
 
 	private boolean testingConnection;
 
@@ -915,7 +939,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					serial.open();
 					if (app.isTestingConnection())
 						return;
-					initOutputFile();
+					//initOutputFile();
 					app.setConnectionOpend(true);
 				}
 			} catch (SerialException e) {
@@ -931,7 +955,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					if (app.isTestingConnection())
 						return;
 
-					initOutputFile();
+					//initOutputFile();
 					app.setConnectionOpend(true);
 					log(methodname, "Port opened successfully!!:" + portname, logFile);
 				} else {
@@ -952,7 +976,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					app.appendMessage("Port opened successfully!!:" + portname);
 					if (app.isTestingConnection())
 						return;
-					initOutputFile();
+				//	initOutputFile();
 					app.setConnectionOpend(true);
 
 					log("Open()", " Port opened successfully!!:" + portname, logFile);
@@ -1028,59 +1052,40 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	String fileName = "";
+	private JButton btnSaveToFile;
 
-	void openFileToWrite() {
-		try {
-			outPrintWriter = new PrintWriter(fileName);
-			log("openFileToWrite()", " File opened successfully:" + fileName, logFile);
-		} catch (FileNotFoundException e) {
-			outPrintWriter = null;
-			textAreaControl.append(e.toString());
-			textAreaControl.append("Error..... Can't open output file !!!");
-			log("openFileToWrite()", "ERROR :" + "FileNotFoundException - Can't open output file :" + fileName,
-					logFile);
-		}
-
-	}
-
-	String generateFileName() {
-		String file_ext = "txt";
-
-		final String fileprefix = "SerialData_";
-		int x = 1;
-		String Dir = WorkingDir;
-
-		File dir = new File(Dir);
-		File[] matchingFiles = dir.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.startsWith(fileprefix);
-			}
-		});
-		String suffix;
-		while (true) {
-			boolean contains = false;
-			suffix = "_" + today + "-" + String.valueOf(x) + "." + file_ext;
-
-			for (int ir = 0; ir < matchingFiles.length; ir++) {
-				// appendMessage(matchingFiles[ir].toString());
-				String s = matchingFiles[ir].toString();
-
-				if (s.contains(suffix)) {
-					// appendMessage("\t FILE PRESENTE");
-					x++;
-					contains = true;
-					break;
-				}
-				suffix = "_" + today + "-" + String.valueOf(x) + "." + file_ext;
-			}
-			if (contains)
-				continue;
-			suffix = "_" + today + "-" + String.valueOf(x) + "." + file_ext;
-			break;
-		}
-		// appendMessage(fileprefix + suffix);
-		return fileprefix + suffix;
-	}
+	/*
+	 * void openFileToWrite() { try { outPrintWriter = new PrintWriter(fileName);
+	 * log("openFileToWrite()", " File opened successfully:" + fileName, logFile); }
+	 * catch (FileNotFoundException e) { outPrintWriter = null;
+	 * textAreaControl.append(e.toString());
+	 * textAreaControl.append("Error..... Can't open output file !!!");
+	 * log("openFileToWrite()", "ERROR :" +
+	 * "FileNotFoundException - Can't open output file :" + fileName, logFile); }
+	 * 
+	 * }
+	 */
+	/*
+	 * String generateFileName() { String file_ext = "txt";
+	 * 
+	 * final String fileprefix = "SerialData_"; int x = 1; String Dir = WorkingDir;
+	 * 
+	 * File dir = new File(Dir); File[] matchingFiles = dir.listFiles(new
+	 * FilenameFilter() { public boolean accept(File dir, String name) { return
+	 * name.startsWith(fileprefix); } }); String suffix; while (true) { boolean
+	 * contains = false; suffix = "_" + today + "-" + String.valueOf(x) + "." +
+	 * file_ext;
+	 * 
+	 * for (int ir = 0; ir < matchingFiles.length; ir++) { //
+	 * appendMessage(matchingFiles[ir].toString()); String s =
+	 * matchingFiles[ir].toString();
+	 * 
+	 * if (s.contains(suffix)) { // appendMessage("\t FILE PRESENTE"); x++; contains
+	 * = true; break; } suffix = "_" + today + "-" + String.valueOf(x) + "." +
+	 * file_ext; } if (contains) continue; suffix = "_" + today + "-" +
+	 * String.valueOf(x) + "." + file_ext; break; } // appendMessage(fileprefix +
+	 * suffix); return fileprefix + suffix; }
+	 */
 
 	/**
 	 * Close serial port and output file
@@ -1094,7 +1099,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					serial.dispose();
 					appendMessage("Port closed :" + portname);
 					app.setConnectionOpend(false);
-					closeOutputFile();
+					//closeOutputFile();
 				} else {
 					appendMessage("Port already closed ;");
 
@@ -1110,16 +1115,13 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	}
 
-	void closeOutputFile() {
-		if (testingConnection)
-			return;
-		if (outPrintWriter != null) {
-			outPrintWriter.close();
-			appendMessage("Closed file " + fileName);
-			outPrintWriter = null;
-		}
-
-	}
+	/*
+	 * void closeOutputFile() { if (testingConnection) return; if (outPrintWriter !=
+	 * null) { outPrintWriter.close(); appendMessage("Closed file " + fileName);
+	 * outPrintWriter = null; }
+	 * 
+	 * }
+	 */
 
 	void appendMessage(String str) {
 		textAreaControl.append(str);
@@ -1140,6 +1142,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 */
 	void writeToSerial(String str) {
 		String app = "";
+		appendMessage(str);
 		try {
 			switch (cboxAppendToMessage.getSelectedIndex()) {
 			case 1:
@@ -1193,12 +1196,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		if (chckbxAutoscroll.isSelected())
 			textAreaSerial.selectAll();
 		// appendMessage("Line recived from port :" + portname);
-
-		if (chckbxWriteToFile.isSelected() && chckbxWriteToFile.isSelected())
-			if (outPrintWriter != null) {
-				outPrintWriter.print(line);
-				outPrintWriter.flush();
-			}
+		/*
+		 * if (chckbxWriteToFile.isSelected() && chckbxWriteToFile.isSelected()) if
+		 * (outPrintWriter != null) { outPrintWriter.print(line);
+		 * outPrintWriter.flush(); }
+		 */
 
 		logDebug("readFromSerial", line, logFile);
 
@@ -1248,7 +1250,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 			writeToSerial(msg);
 
-		} else if (msg.equals(COPY_ALL_TO_CLIPBOARD)) {
+		}else if (msg.equals(btnSendString.getActionCommand())) {
+				writeToSerial(textToSend.getText());
+		 }
+		else if (msg.equals(COPY_ALL_TO_CLIPBOARD)) {
 
 			String myString = textAreaSerial.getText();
 			StringSelection stringSelection = new StringSelection(myString);
