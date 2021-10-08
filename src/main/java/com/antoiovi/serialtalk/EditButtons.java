@@ -103,7 +103,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Component;
 import java.awt.Dimension;
 
-public class EditButtons extends JDialog implements ActionListener {
+public class EditButtons extends JDialog  {
 
 	static EditButtons app;
 
@@ -123,24 +123,42 @@ public class EditButtons extends JDialog implements ActionListener {
 	private JScrollPane scrollPane;
 	private JTable table_1;
 
-	private PropPair properties[];
+	static int returnval=0;
+	
 
-	private PropPair propertiestexts[];
+	public static synchronized int getReturnval() {
+		return returnval;
+	}
 
-	private PropPair propertiescommands[];
+	public static synchronized void setReturnval(int returnval) {
+		EditButtons.returnval = returnval;
+	}
 
-	private PropPair propertiesvisibles[];
 
-	private PropPair proptrimtexts[];
 
-	private PropPair proptrimcmds[];
 
-	private PropPair proptrimmins[];
 
-	private PropPair proptrimmaxs[];
 
-	private PropPair proptrimvis[];
-	HashMap<String,String> propertiesMap;
+	private String[] propertiestexts;
+
+	private String[] propertiescommands;
+
+	private String[] propertiesvisibles;
+
+	private String[] proptrimtexts;
+
+	private String[]  proptrimcmds;
+
+	private String[]  proptrimmins;
+
+	private String[]  proptrimmaxs;
+
+	private String[]  proptrimvis;
+	
+
+	private Properties applicationProps;
+
+	private Properties defaultProps;
 	/**
 	 * Launch the application.
 	 */
@@ -162,57 +180,31 @@ public class EditButtons extends JDialog implements ActionListener {
 	 * Create the frame.
 	 */
 	public EditButtons() {
-		propertiesMap = new HashMap<String,String>();
-		properties = new PropPair[] {
-		new PropPair("btn1.text"),new PropPair("btn2.text"),new PropPair("btn3.text"),new PropPair("btn4.text"),
-		new PropPair("tglbtn1.text"),new PropPair("tglbtn2.text"),new PropPair("tglbtn3.text"),new PropPair("tglbtn4.text"),
-		new PropPair("btnsendmsg.text"),
-		new PropPair("btn1.command"),new PropPair("btn2.command"),new PropPair("btn3.command"),new PropPair("btn4.command"),
-		new PropPair("tglbtn1.command"),new PropPair("tglbtn2.command"),new PropPair("tglbtn3.command"),new PropPair("tglbtn4.command"),
-		new PropPair("btnsendmsg.command"),
-		new PropPair("btn1.visible","boolean"),new PropPair("btn2.visible","boolean"),
-		new PropPair("btn3.visible","boolean"),new PropPair("btn4.visible","boolean"),
-		new PropPair("tglbtn1.visible","boolean"),new PropPair("tglbtn2.visible","boolean"),
-		new PropPair("tglbtn3.visible","boolean"),new PropPair("tglbtn4.visible","boolean"),
-		new PropPair("btnsendmsg.visible","boolean"),
-		new PropPair("trim1.text"),	new PropPair("trim2.text"),	new PropPair("trim1.command"),	new PropPair("trim2.command"),
-		new PropPair("trim1.min","double"),new PropPair("trim1.max","double"),
-		new PropPair("trim2.min","double"),new PropPair("trim2.max","double"),
-		new PropPair("trim1.visible","boolean"),new PropPair("trim1.max","boolean"),
 		
-		};
-		
-		
-		
-		propertiestexts = new PropPair[] {
-				new PropPair("btn1.text"),new PropPair("btn2.text"),new PropPair("btn3.text"),new PropPair("btn4.text"),
-				new PropPair("tglbtn1.text"),new PropPair("tglbtn2.text"),new PropPair("tglbtn3.text"),new PropPair("tglbtn4.text"),
-				new PropPair("btnsendmsg.text"),
-
-				};
-		propertiescommands = new PropPair[] {
-				new PropPair("btn1.command"),new PropPair("btn2.command"),new PropPair("btn3.command"),new PropPair("btn4.command"),
-				new PropPair("tglbtn1.command"),new PropPair("tglbtn2.command"),new PropPair("tglbtn3.command"),new PropPair("tglbtn4.command"),
-				new PropPair("btnsendmsg.command"),				
+		propertiestexts = new String[] {
+				"btn1.text","btn2.text","btn3.text","btn4.text",
+				"tglbtn1.text","tglbtn2.text","tglbtn3.text","tglbtn4.text",
+				"btnsendmsg.text"	};
+		propertiescommands = new String[] {
+				"btn1.command","btn2.command","btn3.command","btn4.command",
+				"tglbtn1.command","tglbtn2.command","tglbtn3.command","tglbtn4.command",
+				"btnsendmsg.command"				
 				};
 		
-		propertiesvisibles = new PropPair[] {
-		new PropPair("btn1.visible","boolean"),new PropPair("btn2.visible","boolean"),
-		new PropPair("btn3.visible","boolean"),new PropPair("btn4.visible","boolean"),
-		new PropPair("tglbtn1.visible","boolean"),new PropPair("tglbtn2.visible","boolean"),
-		new PropPair("tglbtn3.visible","boolean"),new PropPair("tglbtn4.visible","boolean"),
-		new PropPair("btnsendmsg.visible","boolean")};
+		propertiesvisibles = new String[] {
+				"btn1.visible","btn2.visible","btn3.visible","btn4.visible",
+				"tglbtn1.visible","tglbtn2.visible","tglbtn3.visible","tglbtn4.visible",
+				"btnsendmsg.visible"};
 		
-		proptrimtexts = new PropPair[] {
-				new PropPair("trim1.text"),	new PropPair("trim2.text")	};
+		proptrimtexts = new String[] {"trim1.text","trim2.text"	};
 		
-		proptrimcmds = new PropPair[] {
-				new PropPair("trim1.command"),	new PropPair("trim2.command")};
-		proptrimmins = new PropPair[] {
-				new PropPair("trim1.min","double"),	new PropPair("trim2.min","double")	};
-		proptrimmaxs = new PropPair[] {
-					new PropPair("trim1.max","double"),new PropPair("trim2.max","double")};
-		proptrimvis = new PropPair[] {	new PropPair("trim1.visible","boolean"),new PropPair("trim1.max","boolean")	};
+		proptrimcmds = new String[] {"trim1.command",	"trim2.command"};
+		
+		proptrimmins = new String[] {"trim1.min","trim2.min"	};
+		
+		proptrimmaxs = new String[] {"trim1.max","trim2.max"};
+		
+		proptrimvis = new String[] {"trim1.visible","trim2.visible"};
 		
 
 		setBounds(100, 100, 400, 300);
@@ -266,12 +258,17 @@ public class EditButtons extends JDialog implements ActionListener {
 
 		table_1 = new JTable();
 		table_1.setModel(new DefaultTableModel(
-				new Object[][] { { "Trimmer 1", null, null, null, null, null },
-						{ "Trimmer 2", null, null, null, null, null }, },
-				new String[] { "Component", "Text", "Command", "Min", "Max", "Visible" }) {
-			Class[] columnTypes = new Class[] { String.class, String.class, String.class, Double.class, Double.class,
-					Boolean.class };
-
+			new Object[][] {
+				{"Trimmer 1", null, null, null, null, null},
+				{"Trimmer 2", null, null, null, null, null},
+			},
+			new String[] {
+				"Component", "Text", "Command", "Min", "Max", "Visible"
+			}
+		) {
+			Class[] columnTypes = new Class[] {
+				String.class, String.class, String.class, Integer.class, Integer.class, Boolean.class
+			};
 			public Class getColumnClass(int columnIndex) {
 				return columnTypes[columnIndex];
 			}
@@ -287,11 +284,15 @@ public class EditButtons extends JDialog implements ActionListener {
 		btnSave = new JButton("Save");
 		btnSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int input = JOptionPane.showConfirmDialog(null, "Do you want to proceed?", "Select an Option...",
-						JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+				int input = JOptionPane.showConfirmDialog(null, "Do you want to proceed?", "",
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				// 0=yes, 1=no, 2=cancel
-				if (input == 0)
+				if (input == 0) {
 					saveProperties();
+					setReturnval(1);
+
+				dispose();
+				}
 			}
 		});
 		panel_3.add(btnSave);
@@ -299,10 +300,14 @@ public class EditButtons extends JDialog implements ActionListener {
 		btnAbort = new JButton("Abort");
 		btnAbort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int input = JOptionPane.showConfirmDialog(null, "Do you want to proceed?",
-						"Current modifies will be lost.", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+				int input = JOptionPane.showConfirmDialog(null, "Do you want to proceed?\nCurrent modifies will be lost.", 
+						"",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				// 0=yes, 1=no, 2=cancel
 				System.out.println(String.valueOf(input));
+				if (input == 0) {
+					setReturnval(-1);
+					dispose();
+				}
 			}
 		});
 		panel_3.add(btnAbort);
@@ -310,11 +315,10 @@ public class EditButtons extends JDialog implements ActionListener {
 		btnLoadDef = new JButton("Load default");
 		btnLoadDef.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int input = JOptionPane.showConfirmDialog(null, "Do you want to proceed?",
-						"Current modifies will be lost.", JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
+				int input = JOptionPane.showConfirmDialog(null, "Do you want to proceed?\nCurrent modifies will be lost.", "",JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
 				// 0=yes, 1=no, 2=cancel
 				if (input == 0)
-					initDefaultProps();
+					initProperties();
 			}
 		});
 		panel_3.add(btnLoadDef);
@@ -334,142 +338,156 @@ public class EditButtons extends JDialog implements ActionListener {
 
 	}
 
-	Properties properties() {
-		Properties prop = new Properties();
-		try (InputStream input = new FileInputStream(WorkingDir + "/config.properties")) {
-			// load a properties file
-			prop.load(input);
-		} catch (IOException e) {
-			e.printStackTrace();
-			prop = null;
-		}
-		return prop;
-	}
-
-	Properties propertiesDefault() {
-		Properties prop = new Properties();
-		URL url = ClassLoader.getSystemResource("config/config.properties");
-		if (url != null) {
-			try {
-				prop.load(url.openStream());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				prop = null;
-			}
-		}
-		return prop;
-	}
 
 	/**
 	 * Inizzializza le properies se sono state salvate
 	 */
+	/**
+	 * Inizzializza le properies
+	 */
 	void initProperties() {
-		Properties p = properties();
-		if (p == null)
-			p = propertiesDefault();
-		if (p != null)
-			initProps(p);
+		defaultProps = new Properties();
+		URL url = ClassLoader.getSystemResource("config/config.properties");
+		if (url != null) {
+			try {
+				defaultProps.load(url.openStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		applicationProps = new Properties(defaultProps);
+
+		try (InputStream input = new FileInputStream(WorkingDir + "/config.properties")) {
+			// load a properties file
+			applicationProps.load(input);
+			input.close();
+		} catch (IOException e) {
+			// e.printStackTrace();
+		}
+		initProps();
 	}
 
-	void initDefaultProps() {
-		Properties p = propertiesDefault();
-		if (p != null)
-			initProps(p);
-	}
+	
 
-	void initProps(Properties propd) {
+	void initProps() {
+		Properties propd=applicationProps;
 		DefaultTableModel model = (DefaultTableModel) table.getModel();
 		int r=0;
-		for (PropPair p: propertiestexts) {
-			this.setPropertiToTable(model,p,propd,  r++, 1);
+		int col=1;
+		for (String p: propertiestexts) {
+			String val=retriveProp(propd, p,"_");
+			model.setValueAt(val, r++,col);
 		}
 		r=0;
-		for (PropPair p: propertiescommands) {
-			this.setPropertiToTable(model, p,propd, r++,2);
+		col++;
+		for (String p: propertiescommands) {
+			String val=retriveProp(propd, p,"_");
+			model.setValueAt(val, r++,col);
 		}
 		r=0;
-		for (PropPair p: propertiesvisibles) {
-			this.setPropertiToTable(model, p,propd, r++,3);
-		}	
+		col++;
+		for (String p: propertiesvisibles) {
+			Boolean val=Boolean.valueOf( retriveProp(propd, p,false));
+			model.setValueAt(val, r++,col);			}
+			
 		//--------------------------------------------------------
 		
 		model = (DefaultTableModel) table_1.getModel();
-		for (PropPair p: proptrimtexts) {
-			this.setPropertiToTable(model,p,propd,  r++, 1);
+		r=0;
+		col=1;
+		for (String p: proptrimtexts) {
+			String val=retriveProp(propd, p,"_");
+			model.setValueAt(val, r++,col);	
+			}		
+		r=0;
+		col++;
+		for (String p: proptrimcmds) {
+			String val=retriveProp(propd, p,"_");
+			model.setValueAt(val, r++,col);
 		}
 		r=0;
-		for (PropPair p: proptrimcmds) {
-			this.setPropertiToTable(model, p,propd, r++,2);
-		}
-		r=0;
-		for (PropPair p: proptrimmins) {
-			this.setPropertiToTable(model, p,propd, r++,3);
+		col++;
+		for (String p: proptrimmins) {
+			Integer val=Integer.valueOf( retriveProp(propd, p,0));
+			model.setValueAt(val, r++,col);		
+			
 		}	
 		r=0;
-		for (PropPair p: proptrimmaxs) {
-			this.setPropertiToTable(model, p,propd, r++,3);
+		col++;
+		for (String p: proptrimmaxs) {
+			Integer val=Integer.valueOf( retriveProp(propd, p,100));
+			model.setValueAt(val, r++,col);		
+			
 		}	
 		r=0;
-		for (PropPair p: proptrimvis) {
-			this.setPropertiToTable(model, p,propd, r++,3);
-		}	
+		col++;
+		for (String p: proptrimvis) {
+			Boolean val=Boolean.valueOf( retriveProp(propd, p,false));
+			model.setValueAt(val, r++,col);			}	
 
 	}
 
 	void saveProperties() {
 		try (OutputStream output = new FileOutputStream(WorkingDir + "/config.properties")) {
 			DefaultTableModel model = (DefaultTableModel) table.getModel();
-			Properties prop = new Properties();
-			int r = 0;
-			int c = 1;
-			prop.setProperty("btn1.text", (String) model.getValueAt(r, c));
-			prop.setProperty("btn2.text", (String) model.getValueAt(r++, c));
-			prop.setProperty("btn3.text", (String) model.getValueAt(r++, c));
-			prop.setProperty("btn4.text", (String) model.getValueAt(r++, c));
+			Properties prop = applicationProps;
+			int r=0;
+			int col=1;
+			for (String p: propertiestexts) {
+				prop.setProperty(p, (String) model.getValueAt(r++, col));
+			}
+			r=0;
+			col++;
+			for (String p: propertiescommands) {
+				prop.setProperty(p, (String) model.getValueAt(r++, col));
+			}
+			r=0;
+			col++;
+			for (String p: propertiesvisibles) {
+				prop.setProperty(p,String.valueOf( model.getValueAt(r++,col)));
 
-			prop.setProperty("tglbtn1.text", (String) model.getValueAt(r++, c));
-			prop.setProperty("tglbtn2.text", (String) model.getValueAt(r++, c));
-			prop.setProperty("tglbtn3.text", (String) model.getValueAt(r++, c));
-			prop.setProperty("tglbtn4.text", (String) model.getValueAt(r++, c));
-			prop.setProperty("btnsendmsg.text", (String) model.getValueAt(r++, c));
+			}
+			//--------------------------------------------------------
 			
-			prop.setProperty("btnsendmsg.visible",String.valueOf( model.getValueAt(8,3)));
-			/*
-			 * this.setPropertiToTable(model, propd.getProperty("btn1.command"), 0, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("btn1.command"), 1, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("btn1.command"), 2, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("btn1.command"), 3, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("tglbtn1.command"), 4, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("tglbtn2.command"), 5, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("tglbtn3.command"), 6, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("tglbtn4.command"), 7, 2);
-			 * this.setPropertiToTable(model, propd.getProperty("btnsendmsg.command"), 8,
-			 * 2);
-			 * 
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("btn1.visible").equals("true"), 0, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("btn2.visible").equals("true"), 1, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("btn3.visible").equals("true"), 2, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("btn4.visible").equals("true"), 3, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("tglbtn1.visible").equals("true"), 4, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("tglbtn2.visible").equals("true"), 5, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("tglbtn3.visible").equals("true"), 6, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("tglbtn4.visible").equals("true"), 7, 3);
-			 * this.setPropertiToTable(model,
-			 * propd.getProperty("btnsendmsg.visible").equals("true"), 8, 3);
-			 */
+			model = (DefaultTableModel) table_1.getModel();
+			r=0;
+			col=1;
+			for (String p: proptrimtexts) {
+				prop.setProperty(p, (String) model.getValueAt(r++, col));
+
+				}		
+			r=0;
+			col++;
+			for (String p: proptrimcmds) {
+				prop.setProperty(p, (String) model.getValueAt(r++, col));
+			}
+			r=0;
+			col++;
+			for (String p: proptrimmins) {
+				prop.setProperty(p,String.valueOf( model.getValueAt(r++,col)));
+			}	
+			r=0;
+			col++;
+			for (String p: proptrimmaxs) {
+				print("maxs col"+String.valueOf(col));
+				
+				Integer i= (Integer) model.getValueAt(r++, col);
+				print("maxs prop "+p);
+				print("maxs val "+i.toString());
+
+				prop.setProperty(p,i.toString());
+			}	
+			r=0;
+			col++;
+			for (String p: proptrimvis) {
+				prop.setProperty(p,String.valueOf( model.getValueAt(r++,col)));
+
+			}	
+
 
 			// save properties to project root folder
-			prop.store(output, null);
-
+			applicationProps.store(output, "---No Comment---");
+			output.close();
 			System.out.println(prop);
 
 		} catch (IOException io) {
@@ -477,59 +495,35 @@ public class EditButtons extends JDialog implements ActionListener {
 		}
 
 	}
-	boolean retriveBooleanProp(Properties p,String pname) {
-		String val=p.getProperty(pname);
-		if(val!=null)
-			return val.equals("true");
-		 else
-			 return false;
-	}
 	
-	double retriveDoubleProp(Properties p,String pname) {
-		String val=p.getProperty(pname);
-		try {
-			double x=Double.valueOf(val);
-			return x;
-		}catch(Exception e) {
-			return 0.0;
-		}
-		
-	}
-	
-	void setPropertiToTable(DefaultTableModel model, PropPair pp,Properties pr, int r, int c) {
-		pp.setValue(pr);
-		if(pp.type.equals(pp.STRING))
-			model.setValueAt(pp.svalue, r, c);
-		else if(pp.type.equals(pp.BOOLEAN))
-			model.setValueAt(pp.bvalue, r, c);
-		else if(pp.type.equals(pp.DOUBLE))
-			model.setValueAt(pp.dvalue, r, c);
-	
-	}
-	void setPropertiToTable(DefaultTableModel model, String value, int r, int c) {
-		model.setValueAt(value, r, c);
-
+	void print(String s) {
+		System.out.println(s);
 	}
 
-	void setPropertiToTable(DefaultTableModel model, Boolean value, int r, int c) {
-		model.setValueAt(value, r, c);
+	String retriveProp(Properties p, String pname, String def) {
+		String val = p.getProperty(pname, def);
+		return val;
 	}
 
-	void setPropertiToTable(DefaultTableModel model, Double value, int r, int c) {
-		model.setValueAt(value, r, c);
+	boolean retriveProp(Properties p, String pname, Boolean def) {
+		String val = p.getProperty(pname, def.toString());
+		return val.equals("true");
 	}
-	
-	Object getPropertiFromTable(DefaultTableModel model, String value, int r, int c) {
-		
-		return model.getValueAt(r++, c);
-	}
-	
-	
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
-		// TODO Auto-generated method stub
 
+	Double retriveProp(Properties p, String pname, Double def) {
+		String val = p.getProperty(pname, def.toString());
+		return Double.valueOf(val);
 	}
+
+	Integer retriveProp(Properties p, String pname, Integer def) {
+		String val = p.getProperty(pname, def.toString());
+		return Integer.valueOf(val);
+	}
+	
+	
+	
+	
+	
 
 	/**
 	 * Per recuperare le immagini archiviate nel file jar
@@ -541,69 +535,5 @@ public class EditButtons extends JDialog implements ActionListener {
 		final URL url = Thread.currentThread().getContextClassLoader().getResource(pathAndFileName);
 		return Toolkit.getDefaultToolkit().getImage(url);
 	}
-private class PropPair{
-	String STRING="string";
-	String DOUBLE="double";
-	String BOOLEAN="boolean";
 
-	String name;
-	String type;
-	String svalue;
-	double dvalue;
-	boolean bvalue;
-	
-	public PropPair(String name, String type) {
-		super();
-		this.name = name;
-		this.type = type;
-	}
-	public PropPair(String name) {
-		super();
-		this.name = name;
-		this.type = "string";
-	}
-	
-	void setValue(Properties prop) {
-		String val=prop.getProperty(name);
-		if(val!=null) {
-			if(type.equals(STRING)) {
-				this.setValue(val);
-			}else if(type.equals(BOOLEAN)) {
-				this.setValue(val.equals("true"));
-			}else if(type.equals(DOUBLE)) {
-				try {
-					double x=Double.valueOf(val);
-				this.setValue(x);
-				}catch(Exception e) {
-				this.setValue(0.0);
-				}
-			}
-			
-			}
-		 else {
-			 if(type.equals(STRING)) {
-					this.setValue("");
-				}else if(type.equals(BOOLEAN)) {
-					this.setValue(false);
-
-				}else if(type.equals(DOUBLE)) {
-					this.setValue(0.0);
-					
-				}
-				
-				}			 
-	}
-	
-	
-	void setValue(String val) {
-		this.svalue=val;
-	}
-	void setValue(double val) {
-		this.dvalue=val;
-	}
-	void setValue(boolean val) {
-		this.bvalue=val;
-	}
-	
-}
 }

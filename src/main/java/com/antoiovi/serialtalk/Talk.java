@@ -174,8 +174,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JPanel panel_4;
 	private JSlider slider_1;
 	private JPanel panel_5;
-	private JLabel lblPotenziometro;
-	private JLabel lblPotenziometro_1;
+	private JLabel lblTrimmer1;
+	private JLabel lblTrimmer2;
 
 	private JTextArea textAreaSerial;
 
@@ -517,16 +517,16 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		panel_2.add(panel_5);
 		panel_5.setLayout(new BoxLayout(panel_5, BoxLayout.Y_AXIS));
 
-		lblPotenziometro = new JLabel("Trimmer 1");
-		panel_5.add(lblPotenziometro);
+		lblTrimmer1 = new JLabel("Trimmer 1");
+		panel_5.add(lblTrimmer1);
 
 		slider_1 = new JSlider();
 		slider_1.setName("TRIM1");
 		slider_1.addChangeListener(this);
 		panel_5.add(slider_1);
 
-		lblPotenziometro_1 = new JLabel("Trimmer 2");
-		panel_5.add(lblPotenziometro_1);
+		lblTrimmer2 = new JLabel("Trimmer 2");
+		panel_5.add(lblTrimmer2);
 
 		slider_2 = new JSlider();
 		slider_2.setName("TRIM2");
@@ -696,86 +696,106 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		}
 	}
 
-	Properties properties() {
-		Properties prop = new Properties();
-		try (InputStream input = new FileInputStream(WorkingDir + "/config.properties")) {
-			// load a properties file
-			prop.load(input);
-		} catch (IOException e) {
-			//e.printStackTrace();
-			prop = null;
-		}
-		return prop;
-	}
-
-	Properties propertiesDefault() {
-		Properties prop = new Properties();
+	/**
+	 * Inizzializza le properies
+	 */
+	void initProperties() {
+		Properties defaultProps = new Properties();
 		URL url = ClassLoader.getSystemResource("config/config.properties");
 		if (url != null) {
 			try {
-				prop.load(url.openStream());
+				defaultProps.load(url.openStream());
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
-				prop = null;
 			}
 		}
-		return prop;
-	}
+		applicationProps = new Properties(defaultProps);
 
-	
-	/**
-	 * Inizzializza le properies se sono state salvate
-	 */
-	void initProperties() {
-		Properties p = properties();
-		if (p == null)
-			p = propertiesDefault();
-		if (p != null)
-			initProps(p);
-	}
-	
-
-	void initProps(Properties propd) {
-		
-		btnA.setText(propd.getProperty("btn1.text"));
-		btnB.setText(propd.getProperty("btn2.text"));
-		btnC.setText(propd.getProperty("btn3.text"));
-		btnD.setText(propd.getProperty("btn4.text"));
-		btnA.setActionCommand(propd.getProperty("btn1.command"));
-		btnB.setActionCommand(propd.getProperty("btn2.command"));
-		btnC.setActionCommand(propd.getProperty("btn3.command"));
-		btnD.setActionCommand(propd.getProperty("btn4.command"));
-		
-		btnA.setVisible(retriveBooleanProp(propd,"btn1.visible"));
-		btnB.setVisible(retriveBooleanProp(propd,"btn2.visible"));
-		btnC.setVisible(retriveBooleanProp(propd,"btn3.visible"));
-		btnD.setVisible(retriveBooleanProp(propd,"btn4.visible"));
-		tglbtnOnoff1.setText(propd.getProperty("tglbtn1.text"));
-		tglbtnOnoff2.setText(propd.getProperty("tglbtn2.text"));
-		tglbtnOnoff3.setText(propd.getProperty("tglbtn3.text"));
-		tglbtnOnoff4.setText(propd.getProperty("tglbtn4.text"));
-
-		tglbtnOnoff1.setActionCommand(propd.getProperty("tglbtn1.text"));
-		tglbtnOnoff2.setActionCommand(propd.getProperty("tglbtn2.text"));
-		tglbtnOnoff3.setActionCommand(propd.getProperty("tglbtn3.text"));
-		tglbtnOnoff4.setActionCommand(propd.getProperty("tglbtn4.text"));
-
-		tglbtnOnoff1.setVisible(retriveBooleanProp(propd,"tglbtn1.visible"));
-		tglbtnOnoff2.setVisible(retriveBooleanProp(propd,"tglbtn2.visible"));
-		tglbtnOnoff3.setVisible(retriveBooleanProp(propd,"tglbtn3.visible"));
-		tglbtnOnoff4.setVisible(retriveBooleanProp(propd,"tglbtn4.visible"));
-	
+		try (InputStream input = new FileInputStream(WorkingDir + "/config.properties")) {
+			// load a properties file
+			applicationProps.load(input);
+			input.close();
+		} catch (IOException e) {
+			// e.printStackTrace();
 		}
 
-	boolean retriveBooleanProp(Properties p,String pname) {
-		String val=p.getProperty(pname);
-		if(val!=null)
-			return val.equals("true");
-		 else
-			 return false;
+		Properties propd = applicationProps;
+		btnA.setText(propd.getProperty("btn1.text", "A"));
+		btnB.setText(propd.getProperty("btn2.text", "B"));
+		btnC.setText(propd.getProperty("btn3.text", "C"));
+		btnD.setText(propd.getProperty("btn4.text", "D"));
+
+		btnA.setActionCommand(propd.getProperty("btn1.command", "A"));
+		btnB.setActionCommand(propd.getProperty("btn2.command", "B"));
+		btnC.setActionCommand(propd.getProperty("btn3.command", "C"));
+		btnD.setActionCommand(propd.getProperty("btn4.command", "D"));
+
+		btnA.setVisible(retriveProp(propd, "btn1.visible", false));
+		btnB.setVisible(retriveProp(propd, "btn2.visible", false));
+		btnC.setVisible(retriveProp(propd, "btn3.visible", false));
+		btnD.setVisible(retriveProp(propd, "btn4.visible", false));
+
+		tglbtnOnoff1.setText(propd.getProperty("tglbtn1.text", ""));
+		tglbtnOnoff2.setText(propd.getProperty("tglbtn2.text", ""));
+		tglbtnOnoff3.setText(propd.getProperty("tglbtn3.text", ""));
+		tglbtnOnoff4.setText(propd.getProperty("tglbtn4.text", ""));
+
+		tglbtnOnoff1.setActionCommand(propd.getProperty("tglbtn1.text", ""));
+		tglbtnOnoff2.setActionCommand(propd.getProperty("tglbtn2.text", ""));
+		tglbtnOnoff3.setActionCommand(propd.getProperty("tglbtn3.text", ""));
+		tglbtnOnoff4.setActionCommand(propd.getProperty("tglbtn4.text", ""));
+
+		tglbtnOnoff1.setVisible(retriveProp(propd, "tglbtn1.visible", false));
+		tglbtnOnoff2.setVisible(retriveProp(propd, "tglbtn2.visible", false));
+		tglbtnOnoff3.setVisible(retriveProp(propd, "tglbtn3.visible", false));
+		tglbtnOnoff4.setVisible(retriveProp(propd, "tglbtn4.visible", false));
+
+		lblTrimmer1.setText(retriveProp(propd, "trim1.text", "Trimmer 1"));
+		lblTrimmer2.setText(retriveProp(propd, "trim2.text", "Trimmer 2"));
+		lblTrimmer1.setVisible(retriveProp(propd, "trim1.visible", false));
+		lblTrimmer2.setVisible(retriveProp(propd, "trim2.visible", false));
+
+		slider_1.setName(retriveProp(propd, "trim1.command", "T1"));
+		slider_2.setName(retriveProp(propd, "trim2.command", "T2"));
+		slider_1.setVisible(retriveProp(propd, "trim1.visible", false));
+		slider_2.setVisible(retriveProp(propd, "trim2.visible", false));
+		slider_1.setMinimum(retriveProp(propd, "trim1.min", 0));
+		slider_1.setMaximum(retriveProp(propd, "trim1.max", 100));
+		slider_2.setMinimum(retriveProp(propd, "trim1.min", 0));
+		slider_2.setMaximum(retriveProp(propd, "trim2.max", 100));
+
+		btnSendString.setText(propd.getProperty("btnsendmsg.text", "Say hello"));
+		btnSendString.setActionCommand(propd.getProperty("btnsendmsg.command", "sendmsg"));
+		btnSendString.setVisible(retriveProp(propd, "btnsendmsg.visible", false));
+
 	}
-	
+
+	/*
+	 * boolean retriveBooleanProp(Properties p, String pname) { String val =
+	 * p.getProperty(pname, "false"); return val.equals("true"); }
+	 */
+
+	String retriveProp(Properties p, String pname, String def) {
+		String val = p.getProperty(pname, def);
+		return val;
+	}
+
+	boolean retriveProp(Properties p, String pname, Boolean def) {
+		String val = p.getProperty(pname, def.toString());
+		return val.equals("true");
+	}
+
+	Double retriveProp(Properties p, String pname, Double def) {
+		String val = p.getProperty(pname, def.toString());
+		return Double.valueOf(val);
+	}
+
+	Integer retriveProp(Properties p, String pname, Integer def) {
+		String val = p.getProperty(pname, def.toString());
+		System.out.println("-----------> " + val);
+		return Integer.valueOf(val);
+	}
+
 	/**
 	 * GENERATE NEW NAME OF DATA OUTPUT FILE AND OPEN IT
 	 */
@@ -1290,6 +1310,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JButton btnEditBtnPanel;
 	private JPanel panel_10;
 
+	private Properties applicationProps;
+
 	void logDebug(String methodname, String msg, PrintWriter logfile) {
 		if (!LEVEL_DEBUG)
 			return;
@@ -1344,8 +1366,12 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	void editButtonsProperties() {
+		//System.out.println("Call edit buttons---------");
+		EditButtons.setReturnval(-1);
 		EditButtons edb = new EditButtons();
 		edb.setVisible(true);
-
+		//System.out.println("---------Editbuttons out");
+		if (edb.getReturnval() > 0)
+			initProperties();
 	}
 }
