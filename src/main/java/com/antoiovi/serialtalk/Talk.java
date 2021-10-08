@@ -219,6 +219,15 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JCheckBox chckbxAutoscroll;
 
 	private JTextField txtFilename;
+	boolean LEVEL_DEBUG = false;
+	private JCheckBox chckbxHideButtons;
+	private JSplitPane splitPane;
+	private JButton btnEditBtnPanel;
+	private JPanel panel_10;
+
+	private Properties applicationProps;
+	
+	private JToggleButton tglbtnPrintSerialInput;
 
 	/**
 	 * Launch the application.
@@ -396,6 +405,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		});
 
 		panel_1.add(panel_9);
+		
+		tglbtnPrintSerialInput = new JToggleButton("Print serial input",true);
+		tglbtnPrintSerialInput.setSelectedIcon(new ImageIcon(getImage("icons/ON.png")));
+		tglbtnPrintSerialInput.setIcon(new ImageIcon(getImage("icons/OFF.png")));
+		panel_9.add(tglbtnPrintSerialInput);
 		// GENERATE FILE
 		chckbxGenerateFile = new JCheckBox("Create output  file");
 		chckbxGenerateFile.setSelected(true);
@@ -1174,7 +1188,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		default:
 			break;
 		}
-		textAreaSerial.append(line + app);
+		if(tglbtnPrintSerialInput.isSelected()) 
+			textAreaSerial.append(line + app);
 		if (chckbxAutoscroll.isSelected())
 			textAreaSerial.selectAll();
 		// appendMessage("Line recived from port :" + portname);
@@ -1304,13 +1319,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	}
 
-	boolean LEVEL_DEBUG = false;
-	private JCheckBox chckbxHideButtons;
-	private JSplitPane splitPane;
-	private JButton btnEditBtnPanel;
-	private JPanel panel_10;
+	
 
-	private Properties applicationProps;
 
 	void logDebug(String methodname, String msg, PrintWriter logfile) {
 		if (!LEVEL_DEBUG)
