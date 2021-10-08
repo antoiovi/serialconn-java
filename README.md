@@ -93,5 +93,5 @@ con la struttura dei file indicata sopra .
  
  * Messo versione java 1.7
  * Aggiunto l'opzione per nascondere i pulsanti 
- * Aggiunto properties
+ * Aggiunto editing dei pulsanti di input
 

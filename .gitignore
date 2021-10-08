@@ -1,7 +1,7 @@
 # Added for Talk.jar Antonello IOvino
 log_*.txt
 SerialData_*.dat
-
+config.properties
 # Compiled class file
 *.class
 
