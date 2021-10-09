@@ -65,7 +65,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-jar-plugin</artifactId>
 						<configuration>
-							<finalName>Talk-1.2</finalName>
+							<finalName>Talk-1.3</finalName>
 							<archive>
 								<manifest>
 									<addClasspath>true</addClasspath>
