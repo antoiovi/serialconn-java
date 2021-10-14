@@ -841,7 +841,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	Integer retriveProp(Properties p, String pname, Integer def) {
 		String val = p.getProperty(pname, def.toString());
-		System.out.println("-----------> " + val);
 		return Integer.valueOf(val);
 	}
 
@@ -1142,7 +1141,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 */
 	void writeToSerial(String str) {
 		String app = "";
-		appendMessage(str);
+		//appendMessage(str);
 		try {
 			switch (cboxAppendToMessage.getSelectedIndex()) {
 			case 1:
@@ -1164,6 +1163,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			log("writeToSErial", str, logFile);
 
 		} catch (Exception e) {
+			appendMessage(str);
 			appendMessage("Error writing to serial port.");
 			log("writeToSErial", "Errore scrivendo sulla porta", logFile);
 		}

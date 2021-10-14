@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar Talk-1.2.jar
+java -jar Talk-1.3.jar
