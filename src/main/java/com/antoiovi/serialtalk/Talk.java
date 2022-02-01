@@ -228,7 +228,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	private JPanel panel_10;
 
 	private Properties applicationProps;
-	
+
 	private JToggleButton tglbtnPrintSerialInput;
 
 	/**
@@ -407,12 +407,12 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		});
 
 		panel_1.add(panel_9);
-		
-		tglbtnPrintSerialInput = new JToggleButton("Print serial input",true);
+
+		tglbtnPrintSerialInput = new JToggleButton("Print serial input", true);
 		tglbtnPrintSerialInput.setSelectedIcon(new ImageIcon(getImage("icons/ON.png")));
 		tglbtnPrintSerialInput.setIcon(new ImageIcon(getImage("icons/OFF.png")));
 		panel_9.add(tglbtnPrintSerialInput);
-		
+
 		/********
 		 * Save to file
 		 */
@@ -423,28 +423,28 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 				fc.setApproveButtonText("Save");
 				int returnVal = fc.showOpenDialog(app);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File file = fc.getSelectedFile();
-		            File fileName = new File(fc.getSelectedFile() + ".txt");
-		            BufferedWriter outFile = null;
-		            try {
-		               outFile = new BufferedWriter(new FileWriter(fileName));
-		               textAreaSerial.write(outFile);   // *** here: ***
-		            } catch (IOException ex) {
-		               ex.printStackTrace();
-		            } finally {
-		               if (outFile != null) {
-		                  try {
-		                     outFile.close();
-		                  } catch (IOException eioex) {
-		                     // one of the few times that I think that it's OK
-		                     // to leave this blank
-		                  }
-		               }
-		            }
-		         
-		        } else {
-		           // log.append("Open command cancelled by user." + newline);
-		        }
+					File file = fc.getSelectedFile();
+					File fileName = new File(fc.getSelectedFile() + ".txt");
+					BufferedWriter outFile = null;
+					try {
+						outFile = new BufferedWriter(new FileWriter(fileName));
+						textAreaSerial.write(outFile); // *** here: ***
+					} catch (IOException ex) {
+						ex.printStackTrace();
+					} finally {
+						if (outFile != null) {
+							try {
+								outFile.close();
+							} catch (IOException eioex) {
+								// one of the few times that I think that it's OK
+								// to leave this blank
+							}
+						}
+					}
+
+				} else {
+					// log.append("Open command cancelled by user." + newline);
+				}
 
 			}
 		});
@@ -719,7 +719,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		comboBoxParityBits.setSelectedItem(parity_options[PARITY_NONE]);
 		chckbxDTR.setSelected(true);
 		chckbxRTS.setSelected(true);
-		//txtFilename.setText(generateFileName());
+		// txtFilename.setText(generateFileName());
 		log("init()", "Initilized all.. ", logFile);
 
 		initProperties();
@@ -745,9 +745,9 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		}
 	}
 
-	/**
+	/**********************************************************************
 	 * Inizzializza le properies
-	 */
+	 *****************************************************************/
 	void initProperties() {
 		Properties defaultProps = new Properties();
 		URL url = ClassLoader.getSystemResource("config/config.properties");
@@ -789,10 +789,10 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		tglbtnOnoff3.setText(propd.getProperty("tglbtn3.text", ""));
 		tglbtnOnoff4.setText(propd.getProperty("tglbtn4.text", ""));
 
-		tglbtnOnoff1.setActionCommand(propd.getProperty("tglbtn1.text", ""));
-		tglbtnOnoff2.setActionCommand(propd.getProperty("tglbtn2.text", ""));
-		tglbtnOnoff3.setActionCommand(propd.getProperty("tglbtn3.text", ""));
-		tglbtnOnoff4.setActionCommand(propd.getProperty("tglbtn4.text", ""));
+		tglbtnOnoff1.setActionCommand(propd.getProperty("tglbtn1.command", ""));
+		tglbtnOnoff2.setActionCommand(propd.getProperty("tglbtn2.command", ""));
+		tglbtnOnoff3.setActionCommand(propd.getProperty("tglbtn3.command", ""));
+		tglbtnOnoff4.setActionCommand(propd.getProperty("tglbtn4.command", ""));
 
 		tglbtnOnoff1.setVisible(retriveProp(propd, "tglbtn1.visible", false));
 		tglbtnOnoff2.setVisible(retriveProp(propd, "tglbtn2.visible", false));
@@ -824,23 +824,23 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 * p.getProperty(pname, "false"); return val.equals("true"); }
 	 */
 
-	String retriveProp(Properties p, String pname, String def) {
-		String val = p.getProperty(pname, def);
+	String retriveProp(Properties p, String pname, String value) {
+		String val = p.getProperty(pname, value);
 		return val;
 	}
 
-	boolean retriveProp(Properties p, String pname, Boolean def) {
-		String val = p.getProperty(pname, def.toString());
+	boolean retriveProp(Properties p, String pname, Boolean value) {
+		String val = p.getProperty(pname, value.toString());
 		return val.equals("true");
 	}
 
-	Double retriveProp(Properties p, String pname, Double def) {
-		String val = p.getProperty(pname, def.toString());
+	Double retriveProp(Properties p, String pname, Double value) {
+		String val = p.getProperty(pname, value.toString());
 		return Double.valueOf(val);
 	}
 
-	Integer retriveProp(Properties p, String pname, Integer def) {
-		String val = p.getProperty(pname, def.toString());
+	Integer retriveProp(Properties p, String pname, Integer value) {
+		String val = p.getProperty(pname, value.toString());
 		return Integer.valueOf(val);
 	}
 
@@ -899,17 +899,26 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	}
 
 	public void setConnectionOpend(boolean connectionOpend) {
+
 		this.connectionOpend = connectionOpend;
 		btnTestConnection.setEnabled(!connectionOpend);
 		btnOpen.setEnabled(!connectionOpend);
-		txtFilename.setEnabled(!connectionOpend);
-		chckbxWriteToFile.setEnabled(chckbxGenerateFile.isSelected());
-		chckbxGenerateFile.setEnabled(!connectionOpend);
 
+		try {
+			/***
+			 * These components are no more used so they are null; 
+			 */
+			txtFilename.setEnabled(!connectionOpend);
+			chckbxWriteToFile.setEnabled(chckbxGenerateFile.isSelected());
+			chckbxGenerateFile.setEnabled(!connectionOpend);
+		} catch (Exception e) {
+			
+		}
 		comboBoxBaudrate.setEnabled(!connectionOpend);
 		comboBoxPortname.setEnabled(!connectionOpend);
 		chckbxAdvanceConfig.setEnabled(!connectionOpend);
 		btnEditBtnPanel.setEnabled(!connectionOpend);
+
 		if (chckbxAdvanceConfig.isSelected()) {
 			chckbxDTR.setEnabled(!connectionOpend);
 			chckbxRTS.setEnabled(!connectionOpend);
@@ -917,10 +926,12 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			comboBoxParityBits.setEnabled(!connectionOpend);
 			comboBoxStopBits.setEnabled(!connectionOpend);
 		}
+
 		if (connectionOpend)
 			app.setTitle(portname);
 		else
 			app.setTitle("");
+
 	}
 
 	/**
@@ -938,7 +949,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					serial.open();
 					if (app.isTestingConnection())
 						return;
-					//initOutputFile();
+					// initOutputFile();
 					app.setConnectionOpend(true);
 				}
 			} catch (SerialException e) {
@@ -954,7 +965,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					if (app.isTestingConnection())
 						return;
 
-					//initOutputFile();
+					// initOutputFile();
 					app.setConnectionOpend(true);
 					log(methodname, "Port opened successfully!!:" + portname, logFile);
 				} else {
@@ -975,7 +986,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 					app.appendMessage("Port opened successfully!!:" + portname);
 					if (app.isTestingConnection())
 						return;
-				//	initOutputFile();
+					// initOutputFile();
 					app.setConnectionOpend(true);
 
 					log("Open()", " Port opened successfully!!:" + portname, logFile);
@@ -1096,9 +1107,15 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			if (serial != null) {
 				if (serial.portIsOpened()) {
 					serial.dispose();
+					if (app.isTestingConnection())
+						appendMessage("TESTING dopo dispose:" + portname);
+
 					appendMessage("Port closed :" + portname);
 					app.setConnectionOpend(false);
-					//closeOutputFile();
+					if (app.isTestingConnection())
+						appendMessage("TESTING Port closed :" + portname);
+
+					// closeOutputFile();
 				} else {
 					appendMessage("Port already closed ;");
 
@@ -1108,7 +1125,11 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			app.appendMessage("Cant't close serial ! Maybe it's not opened.");
 			log("Stop()", "ERROR: IOException .  Cant't close serial ! Maybe it's not opened.", logFile);
 		} catch (NullPointerException e) {
+
 			app.appendMessage("ERROR: Null Pointer eXception :Closing port not opened.  ");
+			if (app.isTestingConnection())
+				appendMessage("TESTING  :" + portname);
+
 			log("Stop()", "ERROR: Null Pointer eXception, Closing port not opened. ", logFile);
 		}
 
@@ -1141,7 +1162,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 */
 	void writeToSerial(String str) {
 		String app = "";
-		//appendMessage(str);
+		// appendMessage(str);
 		try {
 			switch (cboxAppendToMessage.getSelectedIndex()) {
 			case 1:
@@ -1191,7 +1212,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		default:
 			break;
 		}
-		if(tglbtnPrintSerialInput.isSelected()) 
+		if (tglbtnPrintSerialInput.isSelected())
 			textAreaSerial.append(line + app);
 		if (chckbxAutoscroll.isSelected())
 			textAreaSerial.selectAll();
@@ -1234,26 +1255,29 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 	 */
 	public void actionPerformed(ActionEvent e) {
 		String msg = e.getActionCommand();
-		if (msg.equals("Switch_1") || msg.equals("Switch_2") || msg.equals("Switch_3") || msg.equals("Switch_4")) {
+		String t1 = tglbtnOnoff1.getActionCommand();
+		String t2 = tglbtnOnoff2.getActionCommand();
+		String t3 = tglbtnOnoff3.getActionCommand();
+		String t4 = tglbtnOnoff4.getActionCommand();
+
+		if (msg.equals(t1) || msg.equals(t2) || msg.equals(t3) || msg.equals(t4)) {
 			AbstractButton abstractButton = (AbstractButton) e.getSource();
 			if (msg.indexOf('\n') > -1)
-				appendMessage("New line present in Switxh_kjhk");
+				appendMessage("New line present in " + abstractButton.getText());
 			if (abstractButton.getModel().isSelected())
 				msg = msg + "-ON";
 			else
 				msg = msg + "-OFF";
-
-			appendMessage(msg);
+			// appendMessage(msg);
 			writeToSerial(msg);
 		} else if (msg.equals(btnA.getActionCommand()) || msg.equals(btnB.getActionCommand())
 				|| msg.equals(btnC.getActionCommand()) || msg.equals(btnD.getActionCommand())) {
 
 			writeToSerial(msg);
 
-		}else if (msg.equals(btnSendString.getActionCommand())) {
-				writeToSerial(textToSend.getText());
-		 }
-		else if (msg.equals(COPY_ALL_TO_CLIPBOARD)) {
+		} else if (msg.equals(btnSendString.getActionCommand())) {
+			writeToSerial(textToSend.getText());
+		} else if (msg.equals(COPY_ALL_TO_CLIPBOARD)) {
 
 			String myString = textAreaSerial.getText();
 			StringSelection stringSelection = new StringSelection(myString);
@@ -1324,9 +1348,6 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	}
 
-	
-
-
 	void logDebug(String methodname, String msg, PrintWriter logfile) {
 		if (!LEVEL_DEBUG)
 			return;
@@ -1380,12 +1401,16 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		return Toolkit.getDefaultToolkit().getImage(url);
 	}
 
+	/***
+	 * Edita le properiets : testo nei comandi,valori dei comandi, comandi visibili
+	 * si/no
+	 */
 	void editButtonsProperties() {
-		//System.out.println("Call edit buttons---------");
+		// System.out.println("Call edit buttons---------");
 		EditButtons.setReturnval(-1);
 		EditButtons edb = new EditButtons();
 		edb.setVisible(true);
-		//System.out.println("---------Editbuttons out");
+		// System.out.println("---------Editbuttons out");
 		if (edb.getReturnval() > 0)
 			initProperties();
 	}

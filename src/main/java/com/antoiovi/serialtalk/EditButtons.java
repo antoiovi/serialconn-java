@@ -368,7 +368,9 @@ public class EditButtons extends JDialog  {
 	}
 
 	
-
+/***
+ * Inizzializza i valori nella tabella
+ */
 	void initProps() {
 		Properties propd=applicationProps;
 		DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -499,22 +501,48 @@ public class EditButtons extends JDialog  {
 	void print(String s) {
 		System.out.println(s);
 	}
-
+	
+	
+/***
+ * 
+ * @param p
+ * @param pname
+ * @param def
+ * @return
+ */
 	String retriveProp(Properties p, String pname, String def) {
 		String val = p.getProperty(pname, def);
 		return val;
 	}
-
+/***
+ * 
+ * @param p
+ * @param pname
+ * @param def
+ * @return
+ */
 	boolean retriveProp(Properties p, String pname, Boolean def) {
 		String val = p.getProperty(pname, def.toString());
 		return val.equals("true");
 	}
-
+/***
+ * 
+ * @param p
+ * @param pname
+ * @param def
+ * @return
+ */
 	Double retriveProp(Properties p, String pname, Double def) {
 		String val = p.getProperty(pname, def.toString());
 		return Double.valueOf(val);
 	}
-
+/***
+ * 
+ * @param p
+ * @param pname
+ * @param def
+ * @return
+ */
 	Integer retriveProp(Properties p, String pname, Integer def) {
 		String val = p.getProperty(pname, def.toString());
 		return Integer.valueOf(val);
