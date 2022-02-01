@@ -16,7 +16,7 @@ La mia pagina di riferimento dove viene spiagto il codice :
   	 viene creato un file di output, ed ogni volta che si chiude viene chiuso. 
   	 Ogni volta che si apre il programma viene creato anche un Logfile.txt i cuio vengon scritti gli eventi del
   	  giorno.
- ![alt text]( https://github.com/antoiovi/serialconn-java/blob/master/Talk-1.2.png?raw=true)
+ ![alt text]( https://github.com/antoiovi/serialconn-java/blob/master/Talk.png)
   
  ° La classe Serial.java che utilizza la libreria jssc per connettersi ad una porta seriale e ricevere ed 
  		 inviare  dati ad essa; Le classi del package com.antoiovi.serial possono essere utilizzate per  creare 
