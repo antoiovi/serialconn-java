@@ -49,8 +49,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -59,15 +58,13 @@ import java.util.Properties;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+ 
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.ItemSelectable;
-
+ 
 import javax.swing.JSlider;
 
 import javax.swing.event.ChangeListener;
@@ -95,7 +92,7 @@ import javax.swing.JTextField;
 import javax.swing.JSplitPane;
 import java.awt.FlowLayout;
 
-public class Talk extends JFrame implements ActionListener, LineRecived, ChangeListener, ItemListener {
+public class Talk extends JFrame implements ActionListener, ChangeListener, ItemListener, LineRecived, Display {
 
 	/**
 	 * 
@@ -188,6 +185,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	Serial serial;
 	String portname;
+
+	Tcpconnection tcpconnection = null;
 	private JPopupMenu popupMenu;
 	private JMenuItem mntmCopyAllToClipboard;
 
@@ -264,6 +263,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 						outPrintWriter.close();
 					if (logFile != null)
 						logFile.close();
+					if (tcpconnection != null)
+						tcpconnection.closeTcpconn();
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -724,6 +725,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		initProperties();
 
+		tcpconnection = new Tcpconnection(6868,this);
+		this.appendMessage(tcpconnection.getMsg());
 	}
 
 	private String[] getPortNames() {
@@ -906,13 +909,13 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 		try {
 			/***
-			 * These components are no more used so they are null; 
+			 * These components are no more used so they are null;
 			 */
 			txtFilename.setEnabled(!connectionOpend);
 			chckbxWriteToFile.setEnabled(chckbxGenerateFile.isSelected());
 			chckbxGenerateFile.setEnabled(!connectionOpend);
 		} catch (Exception e) {
-			
+
 		}
 		comboBoxBaudrate.setEnabled(!connectionOpend);
 		comboBoxPortname.setEnabled(!connectionOpend);
@@ -1155,8 +1158,23 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 
 	}
 
+	/***
+	 * Implements Display
+	 * Used eventually from run() method of some thread;
+	 * 
+	 * @param s
+	 */
+	public void display(final String s) {
+		EventQueue.invokeLater(new Runnable() {
+			// @Override
+			public void run() {
+				textAreaControl.append(s + "\u23CE\n");
+			}
+		});
+	}
+
 	/**
-	 * Write to Srial Port
+	 * Write to Serial Port
 	 * 
 	 * @param str
 	 */
@@ -1182,6 +1200,8 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 			// serial.write('\n');
 			appendMessage("Sent to serial port " + portname + " : " + str);
 			log("writeToSErial", str, logFile);
+			if (tcpconnection != null)
+				tcpconnection.print(str);
 
 		} catch (Exception e) {
 			appendMessage(str);
@@ -1222,9 +1242,7 @@ public class Talk extends JFrame implements ActionListener, LineRecived, ChangeL
 		 * (outPrintWriter != null) { outPrintWriter.print(line);
 		 * outPrintWriter.flush(); }
 		 */
-
 		logDebug("readFromSerial", line, logFile);
-
 	}
 
 	/**
