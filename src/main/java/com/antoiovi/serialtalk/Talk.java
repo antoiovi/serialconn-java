@@ -49,7 +49,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
- import java.io.IOException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -58,13 +58,13 @@ import java.util.Properties;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.TimeUnit;
- 
+
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import java.awt.GridLayout;
 import java.awt.Image;
- 
+
 import javax.swing.JSlider;
 
 import javax.swing.event.ChangeListener;
@@ -725,7 +725,7 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 
 		initProperties();
 
-		tcpconnection = new Tcpconnection(6868,this);
+		tcpconnection = new Tcpconnection(6868, this);
 		this.appendMessage(tcpconnection.getMsg());
 	}
 
@@ -1159,8 +1159,7 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 	}
 
 	/***
-	 * Implements Display
-	 * Used eventually from run() method of some thread;
+	 * Implements Display Used eventually from run() method of some thread;
 	 * 
 	 * @param s
 	 */
@@ -1200,9 +1199,10 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 			// serial.write('\n');
 			appendMessage("Sent to serial port " + portname + " : " + str);
 			log("writeToSErial", str, logFile);
-			if (tcpconnection != null)
-				tcpconnection.print(str);
-
+			/***
+			 * Only tro test TCP connection if (tcpconnection != null)
+			 * tcpconnection.print(line);
+			 ***/
 		} catch (Exception e) {
 			appendMessage(str);
 			appendMessage("Error writing to serial port.");
@@ -1243,6 +1243,9 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 		 * outPrintWriter.flush(); }
 		 */
 		logDebug("readFromSerial", line, logFile);
+		if (tcpconnection != null)
+			tcpconnection.print(line);
+
 	}
 
 	/**
@@ -1420,7 +1423,7 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 	}
 
 	/***
-	 * Edita le properiets : testo nei comandi,valori dei comandi, comandi visibili
+	 * Edita le properties : testo nei comandi,valori dei comandi, comandi visibili
 	 * si/no
 	 */
 	void editButtonsProperties() {
