@@ -62,11 +62,13 @@ import java.util.concurrent.TimeUnit;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
+import javax.swing.SpinnerNumberModel;
+
 import java.awt.GridLayout;
 import java.awt.Image;
 
 import javax.swing.JSlider;
-
+import javax.swing.JSpinner;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -88,9 +90,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JSplitPane;
 import java.awt.FlowLayout;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JCheckBoxMenuItem;
 
 public class Talk extends JFrame implements ActionListener, ChangeListener, ItemListener, LineRecived, Display {
 
@@ -221,14 +228,18 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 
 	private JTextField txtFilename;
 	boolean LEVEL_DEBUG = false;
-	private JCheckBox chckbxHideButtons;
 	private JSplitPane splitPane;
-	private JButton btnEditBtnPanel;
-	private JPanel panel_10;
 
 	private Properties applicationProps;
 
 	private JToggleButton tglbtnPrintSerialInput;
+	
+	
+	private JMenuBar menuBar;
+	private JMenu mnNewMenu;
+	private JMenuItem mntmTcpConfig;
+
+	int tcpPort=6868;
 
 	/**
 	 * Launch the application.
@@ -495,21 +506,6 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 		panel_2 = new JPanel();
 		getContentPane().add(panel_2, BorderLayout.WEST);
 		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.Y_AXIS));
-
-		panel_10 = new JPanel();
-		panel_2.add(panel_10);
-		panel_10.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		btnEditBtnPanel = new JButton("Edit panel");
-		btnEditBtnPanel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				editButtonsProperties();
-			}
-		});
-		panel_10.add(btnEditBtnPanel);
-		chckbxHideButtons = new JCheckBox("Hide buttons");
-		panel_10.add(chckbxHideButtons);
-		chckbxHideButtons.addItemListener(this);
 		// PANEL 3 Buttons
 		panel_3 = new JPanel();
 		panel_2.add(panel_3);
@@ -663,6 +659,64 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 
 		popupMenu.addPopupMenuListener(new PopupPrintListener());
 
+	
+		
+		menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		
+		mnNewMenu = new JMenu("Config");
+		menuBar.add(mnNewMenu);
+		
+		SpinnerNumberModel sModel = new SpinnerNumberModel(tcpPort,  6860, 65000, 1);
+		JSpinner spinnerTcpPort = new JSpinner(sModel);
+        spinnerTcpPort.setEditor(new JSpinner.NumberEditor(spinnerTcpPort, "#"));
+	
+		mntmTcpConfig = new JMenuItem("Tcp config");
+		mntmTcpConfig.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				SpinnerNumberModel sModel=	(SpinnerNumberModel) spinnerTcpPort.getModel();
+				sModel.setValue(Integer.valueOf(tcpPort));
+				int option = JOptionPane.showOptionDialog(null, spinnerTcpPort, "Entertcp port where send output (from 6860 to 65000", 
+						JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+				if(option==JOptionPane.OK_OPTION) {
+					Integer i=(Integer) sModel.getValue();
+					tcpPort=i.intValue();
+				}
+				
+			}
+		});
+		mnNewMenu.add(mntmTcpConfig);
+		mntmTcpConfig.setEnabled(true);
+		
+		mntmEditInputPanel = new JMenuItem("Edit input panel");
+		mntmEditInputPanel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				EditButtons.setReturnval(-1);
+				EditButtons edb = new EditButtons();
+				edb.setVisible(true);
+				// System.out.println("---------Editbuttons out");
+				if (edb.getReturnval() > 0)
+					initProperties();
+			}
+		});
+		mnNewMenu.add(mntmEditInputPanel);
+		
+		chckbxmntmShowInputPanel = new JCheckBoxMenuItem("Hide input panel");
+		chckbxmntmShowInputPanel.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				logToConsole("Itenstatechanged");
+				
+				
+					logToConsole("hidebuttons");
+					int state = arg0.getStateChange();
+					logToConsole(String.valueOf(state));
+
+					setButtonsVisible(state == ItemEvent.DESELECTED);
+				}
+		});
+		mnNewMenu.add(chckbxmntmShowInputPanel);
+		
 		init();
 		pack();
 		restoreDefaults();
@@ -724,9 +778,11 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 		log("init()", "Initilized all.. ", logFile);
 
 		initProperties();
-
-		tcpconnection = new Tcpconnection(6868, this);
-		this.appendMessage(tcpconnection.getMsg());
+		tcpconnection=null;
+		/*
+		 * tcpconnection = new Tcpconnection(tcpPort, this);
+		 * this.appendMessage(tcpconnection.getMsg());
+		 */
 	}
 
 	private String[] getPortNames() {
@@ -920,7 +976,7 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 		comboBoxBaudrate.setEnabled(!connectionOpend);
 		comboBoxPortname.setEnabled(!connectionOpend);
 		chckbxAdvanceConfig.setEnabled(!connectionOpend);
-		btnEditBtnPanel.setEnabled(!connectionOpend);
+		mntmTcpConfig.setEnabled(!connectionOpend);
 
 		if (chckbxAdvanceConfig.isSelected()) {
 			chckbxDTR.setEnabled(!connectionOpend);
@@ -930,10 +986,15 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 			comboBoxStopBits.setEnabled(!connectionOpend);
 		}
 
-		if (connectionOpend)
+		if (connectionOpend) {
 			app.setTitle(portname);
-		else
+		tcpconnection = new Tcpconnection(tcpPort, this);
+		this.appendMessage(tcpconnection.getMsg());}
+		else {
 			app.setTitle("");
+			tcpconnection.closeTcpconn();
+			tcpconnection=null;
+		}
 
 	}
 
@@ -1066,39 +1127,10 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 
 	String fileName = "";
 	private JButton btnSaveToFile;
-
-	/*
-	 * void openFileToWrite() { try { outPrintWriter = new PrintWriter(fileName);
-	 * log("openFileToWrite()", " File opened successfully:" + fileName, logFile); }
-	 * catch (FileNotFoundException e) { outPrintWriter = null;
-	 * textAreaControl.append(e.toString());
-	 * textAreaControl.append("Error..... Can't open output file !!!");
-	 * log("openFileToWrite()", "ERROR :" +
-	 * "FileNotFoundException - Can't open output file :" + fileName, logFile); }
-	 * 
-	 * }
-	 */
-	/*
-	 * String generateFileName() { String file_ext = "txt";
-	 * 
-	 * final String fileprefix = "SerialData_"; int x = 1; String Dir = WorkingDir;
-	 * 
-	 * File dir = new File(Dir); File[] matchingFiles = dir.listFiles(new
-	 * FilenameFilter() { public boolean accept(File dir, String name) { return
-	 * name.startsWith(fileprefix); } }); String suffix; while (true) { boolean
-	 * contains = false; suffix = "_" + today + "-" + String.valueOf(x) + "." +
-	 * file_ext;
-	 * 
-	 * for (int ir = 0; ir < matchingFiles.length; ir++) { //
-	 * appendMessage(matchingFiles[ir].toString()); String s =
-	 * matchingFiles[ir].toString();
-	 * 
-	 * if (s.contains(suffix)) { // appendMessage("\t FILE PRESENTE"); x++; contains
-	 * = true; break; } suffix = "_" + today + "-" + String.valueOf(x) + "." +
-	 * file_ext; } if (contains) continue; suffix = "_" + today + "-" +
-	 * String.valueOf(x) + "." + file_ext; break; } // appendMessage(fileprefix +
-	 * suffix); return fileprefix + suffix; }
-	 */
+	private JMenuItem mntmEditInputPanel;
+	private JCheckBoxMenuItem chckbxmntmShowInputPanel;
+	
+	
 
 	/**
 	 * Close serial port and output file
@@ -1245,6 +1277,9 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 		logDebug("readFromSerial", line, logFile);
 		if (tcpconnection != null)
 			tcpconnection.print(line);
+		else
+			textAreaControl.append("tcp connection NULLLLL");
+		
 
 	}
 
@@ -1322,18 +1357,7 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 	 * @param arg0
 	 */
 	public void itemStateChanged(ItemEvent arg0) {
-		logToConsole("Itenstatechanged");
-		if (arg0.getSource().equals(chckbxHideButtons)) {
-			/**
-			 * Viene chiamato due volte: la prima ottengio il valore deselected La seconda
-			 * il valore selezionato
-			 **/
-			logToConsole("hidebuttons");
-			int state = arg0.getStateChange();
-			logToConsole(String.valueOf(state));
-
-			setButtonsVisible(state == ItemEvent.DESELECTED);
-		}
+	
 	}
 
 	void setButtonsVisible(boolean visible) {
@@ -1420,19 +1444,5 @@ public class Talk extends JFrame implements ActionListener, ChangeListener, Item
 	public static Image getImage(final String pathAndFileName) {
 		final URL url = Thread.currentThread().getContextClassLoader().getResource(pathAndFileName);
 		return Toolkit.getDefaultToolkit().getImage(url);
-	}
-
-	/***
-	 * Edita le properties : testo nei comandi,valori dei comandi, comandi visibili
-	 * si/no
-	 */
-	void editButtonsProperties() {
-		// System.out.println("Call edit buttons---------");
-		EditButtons.setReturnval(-1);
-		EditButtons edb = new EditButtons();
-		edb.setVisible(true);
-		// System.out.println("---------Editbuttons out");
-		if (edb.getReturnval() > 0)
-			initProperties();
 	}
 }
